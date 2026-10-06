@@ -51,6 +51,9 @@ describe("model output validation", () => {
     expect(parseWith(missionSchema, good.replace("Step outside", "<b>Step</b> outside")).ok).toBe(false);
     expect(parseWith(missionSchema, '{"title":"x"}').ok).toBe(false);
     expect(parseWith(missionSchema, "no json here").ok).toBe(false);
+    // Measured on real Gemma output: an empty optional field means "absent", not invalid.
+    const empty = parseWith(missionSchema, good.replace('"Let your attention stay with each one."', '""'));
+    expect(empty.ok && empty.value.secondaryInstruction).toBeUndefined();
   });
 
   it("valid Gemma output becomes a mission tagged with its source", async () => {

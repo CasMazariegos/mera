@@ -207,6 +207,10 @@ npm run eval        # real-model mission evaluation (downloads Gemma 3 1B to run
 
 Covered: state transitions, breathing timer, sensory progression, mission schema and safety validation, repair-then-fallback, library safety and selection, reflection wording, pattern grounding, local storage, export and deletion, demo data isolation, server (health, config, structured-only Gemma proxy, security headers, rate limit), accessibility-critical flows, offline use, and the full end-to-end flow.
 
+## Measured results
+
+Real Gemma 3 1B (q4, CPU via transformers.js) through MERA's actual prompts, validators and safety rules — a partial run (11 of 18 synthetic cases; the machine ran out of memory): **8 accepted (2 after the one repair retry), 3 fell back to the library, 0 unsafe missions shown**. Two of the fallbacks came from MERA's own schema rejecting an empty optional field, which is now fixed but not yet re-measured. Details and the per-case table: [docs/EVALUATION.md](docs/EVALUATION.md).
+
 ## Demo
 
 Settings → **Demo mode**: 30-second phone-down and a single breath, clearly labelled. **Add sample history** fills My Patterns with resets marked _sample_ (removable in one tap). Everything else is real.

@@ -26,10 +26,14 @@ export const missionSchema = z.object({
   category: z.enum(CATEGORIES),
   environment: z.enum(ENVIRONMENTS),
   instruction: sentence(140),
-  secondaryInstruction: sentence(120)
-    .optional()
-    .nullable()
-    .transform((v) => v ?? undefined),
+  // An empty optional field means "absent" (small models often send "").
+  secondaryInstruction: z.preprocess(
+    (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+    sentence(120)
+      .optional()
+      .nullable()
+      .transform((v) => v ?? undefined),
+  ),
 });
 export type MissionOutput = z.infer<typeof missionSchema>;
 
