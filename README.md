@@ -188,6 +188,20 @@ MERA ships a **Render Blueprint** (`render.yaml`): one Node web service that bui
 
 The server sets security headers (CSP, nosniff, frame-ancestors none), caches hashed assets immutably, and falls back to `index.html` for client routes.
 
+## Cloudflare deployment (live)
+
+MERA also runs on **Cloudflare Workers**: https://mera.casmazariegos.workers.dev
+
+- Static PWA via Workers Static Assets (SPA fallback, security headers from `public/_headers`).
+- `/api/*` runs in `server/worker.ts` — the same Hono API as the Render server (`server/api.ts`).
+- Connected AI uses **Gemma 4 26B A4B on Cloudflare Workers AI** through the `AI` binding (no API key in the repo). Still opt-in for visitors.
+
+```bash
+npm run deploy:cf   # build → drop the unused >25 MiB ORT wasm → wrangler deploy
+```
+
+Config lives in `wrangler.jsonc` (`MODEL_PROVIDER=workers-ai`, `MODEL_NAME=@cf/google/gemma-4-26b-a4b-it`, `ENABLE_REMOTE_AI=true`).
+
 ## Accessibility
 
 Semantic HTML and headings focused on every scene; keyboard operable, visible focus, Escape exits a reset; the rest of the app is `inert` during a reset; 48 px+ touch targets; WCAG-conscious contrast in light and dark, plus a higher-contrast option; text size options; reduced motion (OS or MERA setting) — breathing is fully conveyed by words and a countdown; sound and haptics optional and always paired with text; colour-independent state (✓ marks, labels); live regions for meaningful changes only.

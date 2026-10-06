@@ -1,0 +1,216 @@
+{
+  "when": "2026-10-06T21:46:10.427Z",
+  "summary": {
+    "model": "onnx-community/gemma-3-1b-it-ONNX",
+    "dtype": "q4",
+    "runtime": "transformers.js on Node (CPU)",
+    "cases": 18,
+    "schemaCompliantFirstTry": "72%",
+    "fullyValidFirstTry": "50%",
+    "acceptedAfterOneRepair": "67%",
+    "fellBackToLibrary": "33%",
+    "screenDependentSuggestions": 0,
+    "medianInstructionWords": 15,
+    "medianLatencyMs": 92746
+  },
+  "rows": [
+    {
+      "id": "overwhelmed-afternoon-outside",
+      "firstSchema": true,
+      "firstSafe": false,
+      "accepted": false,
+      "repaired": false,
+      "screen": false,
+      "words": 0,
+      "ms": 92746,
+      "problem": "too_long_duration"
+    },
+    {
+      "id": "anxious-afternoon-outside",
+      "firstSchema": true,
+      "firstSafe": true,
+      "accepted": true,
+      "repaired": false,
+      "screen": false,
+      "words": 18,
+      "ms": 39886,
+      "title": "Feel the Warmth"
+    },
+    {
+      "id": "angry-afternoon-outside",
+      "firstSchema": true,
+      "firstSafe": true,
+      "accepted": true,
+      "repaired": false,
+      "screen": false,
+      "words": 19,
+      "ms": 41330,
+      "title": "Feel the Warmth"
+    },
+    {
+      "id": "sad-afternoon-outside",
+      "firstSchema": true,
+      "firstSafe": false,
+      "accepted": true,
+      "repaired": true,
+      "screen": false,
+      "words": 14,
+      "ms": 91307,
+      "title": "Simple Movement"
+    },
+    {
+      "id": "overstimulated-afternoon-outside",
+      "firstSchema": false,
+      "firstSafe": false,
+      "accepted": false,
+      "repaired": false,
+      "screen": false,
+      "words": 0,
+      "ms": 152638,
+      "problem": "schema: secondaryInstruction"
+    },
+    {
+      "id": "scattered-afternoon-outside",
+      "firstSchema": true,
+      "firstSafe": true,
+      "accepted": true,
+      "repaired": false,
+      "screen": false,
+      "words": 14,
+      "ms": 149541,
+      "title": "Feel the Ground"
+    },
+    {
+      "id": "drained-afternoon-outside",
+      "firstSchema": false,
+      "firstSafe": false,
+      "accepted": false,
+      "repaired": false,
+      "screen": false,
+      "words": 0,
+      "ms": 193872,
+      "problem": "schema: secondaryInstruction"
+    },
+    {
+      "id": "not_sure-afternoon-outside",
+      "firstSchema": true,
+      "firstSafe": true,
+      "accepted": true,
+      "repaired": false,
+      "screen": false,
+      "words": 13,
+      "ms": 86488,
+      "title": "Warmth on Skin"
+    },
+    {
+      "id": "indoor-only-overwhelmed",
+      "firstSchema": true,
+      "firstSafe": true,
+      "accepted": true,
+      "repaired": false,
+      "screen": false,
+      "words": 20,
+      "ms": 91144,
+      "title": "Warmth"
+    },
+    {
+      "id": "indoor-only-angry",
+      "firstSchema": true,
+      "firstSafe": true,
+      "accepted": true,
+      "repaired": false,
+      "screen": false,
+      "words": 16,
+      "ms": 92655,
+      "title": "Warm Blanket"
+    },
+    {
+      "id": "night-anxious",
+      "firstSchema": true,
+      "firstSafe": false,
+      "accepted": true,
+      "repaired": true,
+      "screen": false,
+      "words": 15,
+      "ms": 163940,
+      "title": "Simple Movement"
+    },
+    {
+      "id": "night-sad-indoor",
+      "firstSchema": false,
+      "firstSafe": false,
+      "accepted": false,
+      "repaired": false,
+      "screen": false,
+      "words": 0,
+      "ms": 203635,
+      "problem": "schema: secondaryInstruction"
+    },
+    {
+      "id": "low-mobility-drained",
+      "firstSchema": false,
+      "firstSafe": false,
+      "accepted": false,
+      "repaired": false,
+      "screen": false,
+      "words": 0,
+      "ms": 204940,
+      "problem": "schema: secondaryInstruction"
+    },
+    {
+      "id": "avoid-sound-scattered",
+      "firstSchema": true,
+      "firstSafe": true,
+      "accepted": true,
+      "repaired": false,
+      "screen": false,
+      "words": 14,
+      "ms": 78317,
+      "title": "Feel the Ground"
+    },
+    {
+      "id": "two-minutes-overstimulated",
+      "firstSchema": false,
+      "firstSafe": false,
+      "accepted": false,
+      "repaired": false,
+      "screen": false,
+      "words": 0,
+      "ms": 128306,
+      "problem": "schema: secondaryInstruction"
+    },
+    {
+      "id": "movement-helped",
+      "firstSchema": true,
+      "firstSafe": true,
+      "accepted": true,
+      "repaired": false,
+      "screen": false,
+      "words": 23,
+      "ms": 83330,
+      "title": "Five Breathing Circles"
+    },
+    {
+      "id": "nature-helped-morning",
+      "firstSchema": true,
+      "firstSafe": true,
+      "accepted": true,
+      "repaired": false,
+      "screen": false,
+      "words": 13,
+      "ms": 69315,
+      "title": "Warmth on Skin"
+    },
+    {
+      "id": "repeat-avoid",
+      "firstSchema": true,
+      "firstSafe": false,
+      "accepted": true,
+      "repaired": true,
+      "screen": false,
+      "words": 15,
+      "ms": 145426,
+      "title": "Gentle Movement"
+    }
+  ]
+}

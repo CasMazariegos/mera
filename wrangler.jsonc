@@ -1,0 +1,28 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mera",
+  "account_id": "601f243ce5ead517b6fdf706be768fa0",
+  "main": "./server/worker.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // Resolve the app's "@/..." imports (shared prompts, schemas and safety rules) via tsconfig paths.
+  "tsconfig": "./tsconfig.server.json",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"],
+  },
+  // Connected AI (opt-in for visitors): Gemma on Cloudflare Workers AI.
+  "ai": { "binding": "AI" },
+  "vars": {
+    "APP_ENV": "production",
+    "MODEL_MODE": "local-first",
+    "ENABLE_LOCAL_AI": "true",
+    "ENABLE_REMOTE_AI": "true",
+    "MODEL_PROVIDER": "workers-ai",
+    "MODEL_NAME": "@cf/google/gemma-4-26b-a4b-it",
+    "REMOTE_AI_RATE_LIMIT": "40",
+  },
+  "observability": { "enabled": true },
+}
