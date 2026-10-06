@@ -1,4 +1,5 @@
 /** Journal: private notes, voice reflections and photos — on this device only. */
+import { BookOpen } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button, EmptyState, Page, Toggle } from "@/components/ui";
 import { db, deleteJournalEntry, exportAll, newId } from "@/data/db";
@@ -44,7 +45,7 @@ export function JournalPage() {
   }
 
   return (
-    <Page eyebrow="Journal" title="This space is yours." intro="No pressure to write anything. Everything here stays on this device.">
+    <Page icon={BookOpen} eyebrow="Journal" title="This space is yours." intro="No pressure to write anything. Everything here stays on this device.">
       {writing ? (
         <div className="rounded-[var(--radius-soft)] border border-line bg-surface p-5">
           <label htmlFor="journal-new" className="sr-only">

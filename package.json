@@ -26,6 +26,7 @@
     "@huggingface/transformers": "^4.3.1",
     "dexie": "^4.4.6",
     "hono": "^4.13.13",
+    "lucide-react": "^1.52.0",
     "motion": "^14.0.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -59,7 +60,7 @@
     "vitest": "^5.0.3",
     "wrangler": "^4.148.0"
   },
-  "description": "MERA \u2014 Meep Emotional Reset Assistant. Come back to yourself.",
+  "description": "MERA — Meep Emotional Reset Assistant. Come back to yourself.",
   "license": "MIT",
   "engines": {
     "node": ">=20"

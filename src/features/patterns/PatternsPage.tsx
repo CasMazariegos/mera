@@ -1,4 +1,5 @@
 /** My Patterns: observations from local history — inspectable and deletable. */
+import { Sprout } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { EmptyState, Page } from "@/components/ui";
 import { meraAI } from "@/ai";
@@ -32,12 +33,13 @@ export function PatternsPage() {
 
   if (!history)
     return (
-      <Page eyebrow="My patterns" title="What seems to help">
+      <Page icon={Sprout} eyebrow="My patterns" title="What seems to help">
         {null}
       </Page>
     );
   return (
     <Page
+      icon={Sprout}
       eyebrow="My patterns"
       title="What seems to help"
       intro="Observations from your own resets, on this device. Not conclusions — just what you might notice too."

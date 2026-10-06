@@ -12,6 +12,17 @@ import { JournalPage } from "@/features/journal/JournalPage";
 import { SettingsPage } from "@/features/settings/SettingsPage";
 import { AboutPage } from "@/features/about/AboutPage";
 import { GroundMeFab } from "@/components/GroundMe";
+import { daypart } from "@/lib/daypart";
+
+/** The sky follows the local time of day. */
+function useDaypart() {
+  useEffect(() => {
+    const apply = () => (document.documentElement.dataset.daypart = daypart(new Date().getHours()));
+    apply();
+    const id = setInterval(apply, 10 * 60_000);
+    return () => clearInterval(id);
+  }, []);
+}
 
 /** Comfort settings → <html> attributes the design tokens respond to. */
 function useComfortSettings() {
@@ -50,6 +61,7 @@ function SubPage({ children }: { children: React.ReactNode }) {
 
 export function App() {
   useComfortSettings();
+  useDaypart();
   const route = useRoute();
   const step = useFlow((s) => s.flow.step);
   const reduce = useSettings((s) => s.reducedMotion === "reduce");

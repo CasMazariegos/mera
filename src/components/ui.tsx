@@ -1,5 +1,6 @@
 /** Small, shared UI primitives. Large touch targets, visible focus, semantic HTML. */
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
 
 const cx = (...c: Array<string | false | null | undefined>) => c.filter(Boolean).join(" ");
 
@@ -16,11 +17,11 @@ export function Button({
       type="button"
       className={cx(
         "inline-flex min-h-14 items-center justify-center gap-2 rounded-full px-7 text-body font-semibold tracking-[0.01em] transition-[background,transform,box-shadow] duration-300 ease-[var(--ease-calm)] select-none disabled:cursor-not-allowed disabled:opacity-50",
-        variant === "primary" && "bg-accent text-on-accent shadow-gentle hover:brightness-110 active:scale-[0.99]",
-        variant === "quiet" && "border border-line-strong bg-surface text-ink hover:bg-elevated",
+        variant === "primary" && "btn-primary active:scale-[0.99]",
+        variant === "quiet" && "glass text-ink shadow-gentle hover:shadow-lift",
         variant === "ghost" && "min-h-12 px-4 font-medium text-ink-2 underline-offset-4 hover:text-ink hover:underline",
         variant === "choice" &&
-          "min-h-16 w-full justify-start rounded-[var(--radius-soft)] border border-line bg-surface px-5 text-left text-h3 font-medium text-ink hover:border-line-strong hover:bg-elevated",
+          "min-h-16 w-full justify-start rounded-[var(--radius-soft)] border border-line/70 bg-surface/90 px-5 text-left text-h3 font-medium text-ink shadow-gentle hover:-translate-y-0.5 hover:shadow-lift",
         className,
       )}
       {...props}
@@ -34,20 +35,44 @@ export function Eyebrow({ children, className }: { children: ReactNode; classNam
   return <p className={cx("text-micro font-semibold tracking-[0.14em] text-muted uppercase", className)}>{children}</p>;
 }
 
-export function Page({ title, eyebrow, intro, children }: { title: string; eyebrow?: string; intro?: ReactNode; children: ReactNode }) {
+export function Page({
+  title,
+  eyebrow,
+  intro,
+  icon: Icon,
+  children,
+}: {
+  title: string;
+  eyebrow?: string;
+  intro?: ReactNode;
+  icon?: LucideIcon;
+  children: ReactNode;
+}) {
   return (
-    <div className="mx-auto w-full max-w-xl px-6 pt-6 pb-32">
-      {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <h1 className="mt-2 font-display text-h1 font-medium tracking-tight text-ink">{title}</h1>
-      {intro && <div className="mt-3 text-body text-ink-2">{intro}</div>}
+    <div className="mx-auto w-full max-w-xl px-5 pt-3 pb-32">
+      <header className="page-hero relative overflow-hidden rounded-[var(--radius-card)] px-6 pt-7 pb-8 shadow-gentle">
+        {Icon && (
+          <span aria-hidden className="glass absolute top-6 right-6 inline-flex size-12 items-center justify-center rounded-2xl text-ink">
+            <Icon className="size-6" strokeWidth={1.6} />
+          </span>
+        )}
+        {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+        <h1 className="mt-2 pr-14 font-display text-h1 font-medium tracking-tight text-balance text-ink">{title}</h1>
+        {intro && <div className="mt-3 text-body text-ink-2">{intro}</div>}
+      </header>
       <div className="mt-8">{children}</div>
     </div>
   );
 }
 
+/** A soft, elevated surface for grouped content. */
+export function Card({ children, className }: { children: ReactNode; className?: string }) {
+  return <div className={cx("rounded-[var(--radius-soft)] border border-line/70 bg-surface p-5 shadow-gentle", className)}>{children}</div>;
+}
+
 export function EmptyState({ title, body, children }: { title: string; body: string; children?: ReactNode }) {
   return (
-    <div className="rounded-[var(--radius-soft)] border border-dashed border-line-strong px-6 py-10 text-center">
+    <div className="rounded-[var(--radius-soft)] border border-dashed border-line-strong bg-surface/50 px-6 py-10 text-center">
       <p className="font-display text-h3 text-ink">{title}</p>
       <p className="mt-2 text-body text-ink-2">{body}</p>
       {children && <div className="mt-6">{children}</div>}

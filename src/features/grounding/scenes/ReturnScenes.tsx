@@ -1,6 +1,9 @@
 /** Scenes 9–12: welcome back, optional reflection, a short honest insight, release. */
 import { useEffect, useRef, useState } from "react";
+import { motion } from "motion/react";
+import { Camera, Clock, Mic, PenLine, Sprout, type LucideIcon } from "lucide-react";
 import { MeraCharacter } from "@/components/MeraCharacter";
+import { EMOTION_ICON, EMOTION_TINT, OUTCOME_ICON, Sparkles } from "@/components/icons";
 import { Button, Eyebrow } from "@/components/ui";
 import { useFlow } from "@/store/flow";
 import { useSettings } from "@/store/settings";
@@ -12,31 +15,52 @@ import { VoiceRecorder } from "@/features/reflections/VoiceRecorder";
 import { EMOTION_LABEL, OUTCOME_LABEL, type JournalEntry, type Outcome } from "@/types";
 import { Scene } from "../Scene";
 
+const OUTCOMES: Array<{ value: Outcome; label: string; tint: string }> = [
+  { value: "better", label: "Better", tint: "var(--accent-soft)" },
+  { value: "same", label: "About the same", tint: "var(--sky-soft)" },
+  { value: "worse", label: "Worse", tint: "var(--clay-soft)" },
+];
+
 export function ReturnScene() {
   const send = useFlow((s) => s.send);
   const pick = (outcome: Outcome) => send({ type: "PICK_OUTCOME", outcome });
   return (
     <Scene
       title="Welcome back."
-      top={<MeraCharacter state="returning" size={120} className="mt-2" />}
+      top={
+        <motion.div initial={{ x: -50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }} className="mt-2">
+          <MeraCharacter state="returning" size={120} />
+        </motion.div>
+      }
       footer={
-        <>
-          <Button variant="choice" onClick={() => pick("better")} data-testid="outcome-better">
-            Better
-          </Button>
-          <Button variant="choice" onClick={() => pick("same")} data-testid="outcome-same">
-            About the same
-          </Button>
-          <Button variant="choice" onClick={() => pick("worse")} data-testid="outcome-worse">
-            Worse
-          </Button>
-          <Button variant="ghost" onClick={() => pick("other")}>
-            Something else
-          </Button>
-        </>
+        <Button variant="ghost" onClick={() => pick("other")}>
+          Something else
+        </Button>
       }
     >
-      <p className="mt-5 text-h3 text-ink-2">How do you feel compared with a few minutes ago?</p>
+      <p className="mt-5 max-w-xs text-h3 text-balance text-ink-2">How do you feel compared with a few minutes ago?</p>
+      <div className="mt-8 grid w-full grid-cols-3 gap-3" role="group" aria-label="Compared with before">
+        {OUTCOMES.map((o, i) => {
+          const Icon = OUTCOME_ICON[o.value];
+          return (
+            <motion.button
+              key={o.value}
+              type="button"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + 0.08 * i, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              onClick={() => pick(o.value)}
+              className="flex min-h-32 flex-col items-center justify-center gap-3 rounded-[var(--radius-soft)] border border-line/70 bg-surface/85 px-2 text-small font-semibold text-ink shadow-gentle transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-lift"
+              data-testid={`outcome-${o.value}`}
+            >
+              <span aria-hidden className="inline-flex size-12 items-center justify-center rounded-full" style={{ background: o.tint }}>
+                <Icon className="size-5" strokeWidth={2} />
+              </span>
+              {o.label}
+            </motion.button>
+          );
+        })}
+      </div>
     </Scene>
   );
 }
@@ -73,7 +97,12 @@ export function ReflectionScene() {
 
   const photoPicker = (
     <>
-      <button type="button" className="min-h-11 text-small text-muted underline underline-offset-4" onClick={() => fileRef.current?.click()}>
+      <button
+        type="button"
+        className="glass inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-small font-medium text-ink-2 shadow-gentle hover:text-ink"
+        onClick={() => fileRef.current?.click()}
+      >
+        <Camera aria-hidden className="size-4" strokeWidth={1.75} />
         {after ? "Photo added (stays on this device)" : "Add a photo of what you found"}
       </button>
       <input
@@ -113,10 +142,10 @@ export function ReflectionScene() {
           onChange={(e) => setText(e.target.value.slice(0, 1000))}
           placeholder={placeholder}
           rows={5}
-          className="mt-8 w-full resize-none rounded-[var(--radius-soft)] border border-line-strong bg-surface p-4 text-body text-ink placeholder:text-muted"
+          className="mt-8 w-full resize-none rounded-[var(--radius-soft)] border border-line/70 bg-surface/90 p-5 text-body text-ink shadow-gentle placeholder:text-muted focus:border-accent"
           data-testid="note-text"
         />
-        <div className="mt-3">{photoPicker}</div>
+        <div className="mt-4">{photoPicker}</div>
       </Scene>
     );
   }
@@ -129,36 +158,55 @@ export function ReflectionScene() {
             onCancel={() => setMode("choose")}
           />
         </div>
-        <div className="mt-3">{photoPicker}</div>
+        <div className="mt-4">{photoPicker}</div>
       </Scene>
     );
   }
+  const choices = [
+    { key: "voice", label: "Voice", hint: "Say it, keep it", icon: Mic, tint: "var(--sky-soft)", onClick: () => setMode("voice"), testid: "voice-note" },
+    { key: "type", label: "Type", hint: "A line or two", icon: PenLine, tint: "var(--sand-soft)", onClick: () => setMode("type"), testid: "type-note" },
+  ];
   return (
     <Scene
       title="Want to leave yourself a note?"
       footer={
-        <>
-          <Button variant="quiet" onClick={() => setMode("voice")}>
-            Voice
-          </Button>
-          <Button variant="quiet" onClick={() => setMode("type")} data-testid="type-note">
-            Type
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => {
-              const before = takeBeforePhoto();
-              if (before) void save({ kind: "text", text: "", photo: before, photoMime: before.type });
-              else send({ type: "SKIP_REFLECTION" });
-            }}
-            data-testid="skip-note"
-          >
-            Skip
-          </Button>
-        </>
+        <Button
+          variant="ghost"
+          onClick={() => {
+            const before = takeBeforePhoto();
+            if (before) void save({ kind: "text", text: "", photo: before, photoMime: before.type });
+            else send({ type: "SKIP_REFLECTION" });
+          }}
+          data-testid="skip-note"
+        >
+          Skip
+        </Button>
       }
     >
       <p className="mt-5 text-body text-ink-2">Completely optional. It stays on this device.</p>
+      <div className="mt-8 grid w-full grid-cols-2 gap-3">
+        {choices.map((c) => {
+          const Icon = c.icon;
+          return (
+            <button
+              key={c.key}
+              type="button"
+              onClick={c.onClick}
+              aria-describedby={`hint-${c.key}`}
+              className="flex min-h-36 flex-col items-start justify-between rounded-[var(--radius-soft)] border border-line/70 bg-surface/85 p-4 text-left shadow-gentle transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-lift"
+              data-testid={c.testid}
+            >
+              <span aria-hidden className="inline-flex size-11 items-center justify-center rounded-2xl text-ink" style={{ background: c.tint }}>
+                <Icon className="size-5" strokeWidth={1.75} />
+              </span>
+              <span className="text-body font-semibold text-ink">{c.label}</span>
+              <span id={`hint-${c.key}`} className="-mt-2 text-micro text-ink-2">
+                {c.hint}
+              </span>
+            </button>
+          );
+        })}
+      </div>
     </Scene>
   );
 }
@@ -205,7 +253,12 @@ export function AiReflectionScene() {
 
   return (
     <Scene title="One moment.">
-      <MeraCharacter state="thinking" size={110} className="mt-10" label="MERA is noting what helped" />
+      <div className="relative mt-10 flex size-48 items-center justify-center">
+        <span aria-hidden className="absolute inset-0 animate-halo rounded-full border-2 border-accent/30" />
+        <span aria-hidden className="absolute inset-0 animate-halo rounded-full border-2 border-accent/20 [animation-delay:2s]" />
+        <MeraCharacter state="thinking" size={110} label="MERA is noting what helped" />
+      </div>
+      <p className="mt-6 text-small text-ink-2">Noting what helped, so next time is easier.</p>
     </Scene>
   );
 }
@@ -234,38 +287,64 @@ export function CompleteScene() {
         </Button>
       }
     >
-      <MeraCharacter state="celebrating" size={96} />
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        className="relative"
+      >
+        <span aria-hidden className="absolute inset-0 -m-6 rounded-full bg-sunrise-soft/70 blur-2xl" />
+        <div className="relative">
+          <MeraCharacter state="celebrating" size={104} />
+        </div>
+      </motion.div>
       <Eyebrow className="mt-6">Reset complete</Eyebrow>
       <h1 id="complete-title" tabIndex={-1} className="sr-only">
         Reset complete
       </h1>
-      <dl className="mt-6 w-full divide-y divide-line rounded-[var(--radius-soft)] border border-line bg-surface text-left" data-testid="recap">
-        {flow.emotion && (
-          <div className="flex items-baseline justify-between gap-4 px-5 py-4">
-            <dt className="text-small text-ink-2">You started feeling</dt>
-            <dd className="text-body font-semibold text-ink">{EMOTION_LABEL[flow.emotion]}</dd>
-          </div>
-        )}
-        <div className="flex items-baseline justify-between gap-4 px-5 py-4">
-          <dt className="text-small text-ink-2">Time away from the screen</dt>
-          <dd className="text-body font-semibold text-ink">
-            {flow.phoneDownSeconds < 60 ? `${flow.phoneDownSeconds} seconds` : `${minutes} minute${minutes === 1 ? "" : "s"}`}
-          </dd>
-        </div>
-        {flow.outcome && (
-          <div className="flex items-baseline justify-between gap-4 px-5 py-4">
-            <dt className="text-small text-ink-2">After the reset</dt>
-            <dd className="text-body font-semibold text-ink">{OUTCOME_LABEL[flow.outcome]}</dd>
-          </div>
-        )}
+      <dl className="mt-5 grid w-full grid-cols-3 gap-2.5 text-center" data-testid="recap">
+        <Stat
+          label="You started"
+          value={flow.emotion ? EMOTION_LABEL[flow.emotion] : "—"}
+          icon={flow.emotion ? EMOTION_ICON[flow.emotion] : Sparkles}
+          tint={flow.emotion ? EMOTION_TINT[flow.emotion] : "var(--surface-sunk)"}
+        />
+        <Stat label="Time away" value={flow.phoneDownSeconds < 60 ? `${flow.phoneDownSeconds} sec` : `${minutes} min`} icon={Clock} tint="var(--sand-soft)" />
+        <Stat
+          label="Now"
+          value={flow.outcome ? OUTCOME_LABEL[flow.outcome] : "—"}
+          icon={flow.outcome ? OUTCOME_ICON[flow.outcome] : Sprout}
+          tint="var(--accent-soft)"
+        />
       </dl>
-      {flow.insight && (
-        <p className="mt-6 text-body text-ink" data-testid="insight">
-          {flow.insight}
-        </p>
+      {(flow.insight || pattern) && (
+        <div className="glass mt-4 w-full rounded-[var(--radius-soft)] p-5 text-left shadow-gentle">
+          {flow.insight && (
+            <p className="text-body text-ink" data-testid="insight">
+              {flow.insight}
+            </p>
+          )}
+          {pattern && (
+            <p className={`flex items-start gap-2 text-small text-ink-2 ${flow.insight ? "mt-3 border-t border-line/70 pt-3" : ""}`}>
+              <Sprout aria-hidden className="mt-0.5 size-4 shrink-0 text-accent-strong" strokeWidth={2} />
+              {pattern}
+            </p>
+          )}
+        </div>
       )}
-      {pattern && <p className="mt-3 text-small text-ink-2">{pattern}</p>}
-      <p className="mt-8 font-display text-h2 text-ink">Go live your life.</p>
+      <p className="mt-8 font-display text-h1 font-normal text-ink italic">Go live your life.</p>
     </Scene>
+  );
+}
+
+function Stat({ label, value, icon: Icon, tint }: { label: string; value: string; icon: LucideIcon; tint: string }) {
+  return (
+    <div className="flex flex-col items-center gap-2 rounded-[var(--radius-soft)] border border-line/70 bg-surface/85 px-2 py-4 shadow-gentle">
+      <span aria-hidden className="inline-flex size-9 items-center justify-center rounded-full" style={{ background: tint }}>
+        <Icon className="size-4" strokeWidth={2} />
+      </span>
+      <dt className="text-micro text-ink-2">{label}</dt>
+      <dd className="text-small leading-tight font-semibold text-ink">{value}</dd>
+    </div>
   );
 }

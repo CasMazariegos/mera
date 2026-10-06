@@ -1,117 +1,199 @@
 @import "tailwindcss";
 @import "@fontsource-variable/figtree";
 @import "@fontsource-variable/fraunces";
+@import "@fontsource-variable/fraunces/wght-italic.css";
 
 /*
  * MERA design tokens.
  * Palette: warm sand, stone, fog, moss, sage, muted sky, soft sunrise, charcoal.
- * Green is an accent, not the whole room. The deeper someone goes into a reset,
- * the quieter the screen gets (see [data-mode="grounding"]).
+ * Green is an accent, not the whole room. Dark mode is "dusk" — soft and warm,
+ * never black. The sky follows the time of day (html[data-daypart]).
  */
 :root {
-  --background: #f4f0e8; /* warm sand */
-  --surface: #fbf9f4; /* paper */
+  --background: #f5f1e8;
+  --surface: #fcfaf5;
   --surface-elevated: #ffffff;
-  --surface-sunk: #ebe5d9; /* sand, one step down */
-  --text-primary: #23261f; /* charcoal moss */
-  --text-secondary: #5e6257; /* stone (6.0:1 on sand) */
-  --text-muted: #6e7166; /* 4.6:1 on sand */
-  --accent: #4a5d3f; /* moss — 7.1:1 on sand */
-  --accent-contrast: #f8f6ef;
-  --accent-soft: #dfe5d3; /* sage wash */
-  --sky: #8ea4b3; /* muted sky */
-  --sky-soft: #dde5ea;
-  --sunrise: #e9b98f; /* soft sunrise */
-  --sunrise-soft: #f6e3d1;
-  --grounding: #e8e3d8; /* fog — grounding scenes */
+  --surface-sunk: #ece6d9;
+  --text-primary: #24271f;
+  --text-secondary: #575b50;
+  --text-muted: #686b60;
+  --accent: #4b6141;
+  --accent-strong: #3d5135;
+  --accent-contrast: #fbf9f2;
+  --accent-soft: #dfe7d2;
+  --sky: #7f9aae;
+  --sky-soft: #dde7ee;
+  --sunrise: #e8a87c;
+  --sunrise-soft: #f8e4d3;
+  --clay: #c98a6b;
+  --clay-soft: #f3ddd2;
+  --sand-soft: #efe5d1;
+  --grounding: #ece6da;
   --success: #3f6b4a;
   --warning: #8a5a1c;
-  --border: #d8d1c3;
-  --border-strong: #b9b1a1;
+  --border: #ddd5c6;
+  --border-strong: #bdb4a3;
   --focus: #2f5d8a;
-  --shadow: 0 1px 2px rgb(48 42 30 / 0.06), 0 8px 28px rgb(48 42 30 / 0.08);
-  --shadow-soft: 0 1px 1px rgb(48 42 30 / 0.04), 0 4px 14px rgb(48 42 30 / 0.06);
+  --shadow: 0 1px 2px rgb(60 50 30 / 0.06), 0 12px 32px -8px rgb(60 50 30 / 0.16);
+  --shadow-soft: 0 1px 1px rgb(60 50 30 / 0.04), 0 6px 18px -6px rgb(60 50 30 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(60 50 30 / 0.06), 0 22px 48px -12px rgb(60 50 30 / 0.22);
+  --glass: rgb(255 255 255 / 0.62);
+  --glass-border: rgb(255 255 255 / 0.75);
+
+  /* Landscape */
+  --hill-far: #c9d4bb;
+  --hill-mid: #a9bb95;
+  --hill-near: #869e70;
+  --grass: #6f8a5a;
+
+  /* Sky (default: day) — overridden per daypart below */
+  --sky-top: #cfe0ea;
+  --sky-mid: #e8eee9;
+  --sky-low: #f5efe2;
+  --sun: #fff1cf;
+  --sun-glow: rgb(255 226 170 / 0.55);
 
   /* Meep (MERA variant): stone-sage body, moss sprout, sunrise cheeks. */
-  --meep-body: #c8cdbd;
-  --meep-body-shade: #b3b9a6;
+  --meep-body: #cdd2c1;
+  --meep-body-shade: #b5bca7;
   --meep-sprout: #6b8a55;
-  --meep-cheek: #eeb3a0;
+  --meep-cheek: #efb09c;
   --meep-ink: #26291f;
 
   color-scheme: light;
 }
 
+html[data-daypart="dawn"] {
+  --sky-top: #e9d6e3;
+  --sky-mid: #f6dccb;
+  --sky-low: #f8ecdc;
+  --sun: #ffe3c4;
+  --sun-glow: rgb(255 196 160 / 0.6);
+}
+html[data-daypart="golden"] {
+  --sky-top: #f2d9b5;
+  --sky-mid: #f6e3c7;
+  --sky-low: #f7eedf;
+  --sun: #ffe0a8;
+  --sun-glow: rgb(255 200 120 / 0.6);
+}
+html[data-daypart="dusk"] {
+  --sky-top: #cdc5dc;
+  --sky-mid: #ecd2d0;
+  --sky-low: #f4e7dc;
+  --sun: #ffd7b8;
+  --sun-glow: rgb(240 170 150 / 0.5);
+}
+html[data-daypart="night"] {
+  --sky-top: #b8c2d8;
+  --sky-mid: #d6d9e3;
+  --sky-low: #ece7dd;
+  --sun: #f4f1e6;
+  --sun-glow: rgb(220 225 240 / 0.6);
+}
+
+/* Dusk mode: warm deep sage-slate. Never black. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --background: #171915;
-    --surface: #1f221d;
-    --surface-elevated: #272a24;
-    --surface-sunk: #131511;
-    --text-primary: #ece9e0;
-    --text-secondary: #b7b6ab;
-    --text-muted: #a3a397;
-    --accent: #b4c99f;
-    --accent-contrast: #182014;
-    --accent-soft: #2c3527;
-    --sky: #9db3c2;
-    --sky-soft: #24303a;
-    --sunrise: #e2b48c;
-    --sunrise-soft: #3a2c21;
-    --grounding: #1b1d19;
-    --success: #9cc9a5;
-    --warning: #e3b678;
-    --border: #34382f;
-    --border-strong: #4a4f43;
-    --focus: #9cc3ea;
-    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 28px rgb(0 0 0 / 0.35);
-    --shadow-soft: 0 1px 1px rgb(0 0 0 / 0.3), 0 4px 14px rgb(0 0 0 / 0.25);
-    --meep-body: #a9ae9f;
-    --meep-body-shade: #959a8b;
-    --meep-sprout: #8fb07a;
-    --meep-cheek: #d99c8b;
-    --meep-ink: #1a1c17;
+    --background: #2a3028;
+    --surface: #333a30;
+    --surface-elevated: #3b4337;
+    --surface-sunk: #252a23;
+    --text-primary: #f2efe6;
+    --text-secondary: #cfd1c4;
+    --text-muted: #b6b9ab;
+    --accent: #c5d9ab;
+    --accent-strong: #d6e6c0;
+    --accent-contrast: #1f2a19;
+    --accent-soft: #445238;
+    --sky: #a7bccd;
+    --sky-soft: #3b4752;
+    --sunrise: #e8b48e;
+    --sunrise-soft: #54443a;
+    --clay: #e0a588;
+    --clay-soft: #55423a;
+    --sand-soft: #4a4637;
+    --grounding: #2e352c;
+    --success: #a6d3ae;
+    --warning: #e7bd82;
+    --border: #48503f;
+    --border-strong: #5d6652;
+    --focus: #a8ccf0;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.25), 0 12px 32px -8px rgb(0 0 0 / 0.35);
+    --shadow-soft: 0 1px 1px rgb(0 0 0 / 0.2), 0 6px 18px -6px rgb(0 0 0 / 0.3);
+    --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.25), 0 22px 48px -12px rgb(0 0 0 / 0.45);
+    --glass: rgb(60 68 56 / 0.62);
+    --glass-border: rgb(255 255 255 / 0.1);
+    --hill-far: #4a5844;
+    --hill-mid: #3f4c39;
+    --hill-near: #36422f;
+    --grass: #5d7550;
+    --sky-top: #4b5a73;
+    --sky-mid: #6a6a7e;
+    --sky-low: #8a7a7a;
+    --sun: #f6e6c8;
+    --sun-glow: rgb(250 220 180 / 0.35);
+    --meep-body: #b9bfac;
+    --meep-body-shade: #a3aa95;
+    --meep-sprout: #94b67d;
+    --meep-cheek: #de9e8b;
+    --meep-ink: #1c1f18;
     color-scheme: dark;
   }
 }
-
 :root[data-theme="dark"] {
-  --background: #171915;
-  --surface: #1f221d;
-  --surface-elevated: #272a24;
-  --surface-sunk: #131511;
-  --text-primary: #ece9e0;
-  --text-secondary: #b7b6ab;
-  --text-muted: #a3a397;
-  --accent: #b4c99f;
-  --accent-contrast: #182014;
-  --accent-soft: #2c3527;
-  --sky: #9db3c2;
-  --sky-soft: #24303a;
-  --sunrise: #e2b48c;
-  --sunrise-soft: #3a2c21;
-  --grounding: #1b1d19;
-  --success: #9cc9a5;
-  --warning: #e3b678;
-  --border: #34382f;
-  --border-strong: #4a4f43;
-  --focus: #9cc3ea;
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 28px rgb(0 0 0 / 0.35);
-  --shadow-soft: 0 1px 1px rgb(0 0 0 / 0.3), 0 4px 14px rgb(0 0 0 / 0.25);
-  --meep-body: #a9ae9f;
-  --meep-body-shade: #959a8b;
-  --meep-sprout: #8fb07a;
-  --meep-cheek: #d99c8b;
-  --meep-ink: #1a1c17;
+  --background: #2a3028;
+  --surface: #333a30;
+  --surface-elevated: #3b4337;
+  --surface-sunk: #252a23;
+  --text-primary: #f2efe6;
+  --text-secondary: #cfd1c4;
+  --text-muted: #b6b9ab;
+  --accent: #c5d9ab;
+  --accent-strong: #d6e6c0;
+  --accent-contrast: #1f2a19;
+  --accent-soft: #445238;
+  --sky: #a7bccd;
+  --sky-soft: #3b4752;
+  --sunrise: #e8b48e;
+  --sunrise-soft: #54443a;
+  --clay: #e0a588;
+  --clay-soft: #55423a;
+  --sand-soft: #4a4637;
+  --grounding: #2e352c;
+  --success: #a6d3ae;
+  --warning: #e7bd82;
+  --border: #48503f;
+  --border-strong: #5d6652;
+  --focus: #a8ccf0;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.25), 0 12px 32px -8px rgb(0 0 0 / 0.35);
+  --shadow-soft: 0 1px 1px rgb(0 0 0 / 0.2), 0 6px 18px -6px rgb(0 0 0 / 0.3);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.25), 0 22px 48px -12px rgb(0 0 0 / 0.45);
+  --glass: rgb(60 68 56 / 0.62);
+  --glass-border: rgb(255 255 255 / 0.1);
+  --hill-far: #4a5844;
+  --hill-mid: #3f4c39;
+  --hill-near: #36422f;
+  --grass: #5d7550;
+  --sky-top: #4b5a73;
+  --sky-mid: #6a6a7e;
+  --sky-low: #8a7a7a;
+  --sun: #f6e6c8;
+  --sun-glow: rgb(250 220 180 / 0.35);
+  --meep-body: #b9bfac;
+  --meep-body-shade: #a3aa95;
+  --meep-sprout: #94b67d;
+  --meep-cheek: #de9e8b;
+  --meep-ink: #1c1f18;
   color-scheme: dark;
 }
 
-/* High contrast: stronger text and borders, no soft washes. */
 :root[data-contrast="more"] {
   --text-secondary: var(--text-primary);
   --text-muted: var(--text-primary);
   --border: var(--text-secondary);
   --border-strong: var(--text-primary);
+  --glass: var(--surface);
 }
 
 @theme inline {
@@ -123,28 +205,32 @@
   --color-ink-2: var(--text-secondary);
   --color-muted: var(--text-muted);
   --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
   --color-on-accent: var(--accent-contrast);
   --color-accent-soft: var(--accent-soft);
   --color-sky: var(--sky);
   --color-sky-soft: var(--sky-soft);
   --color-sunrise: var(--sunrise);
   --color-sunrise-soft: var(--sunrise-soft);
+  --color-clay: var(--clay);
+  --color-clay-soft: var(--clay-soft);
+  --color-sand-soft: var(--sand-soft);
   --color-grounding: var(--grounding);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-line: var(--border);
   --color-line-strong: var(--border-strong);
+  --color-glass: var(--glass);
 
   --font-sans: "Figtree Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
 
-  /* Type scale (rem; scales with the person's text size). */
-  --text-display: 3.25rem;
-  --text-display--line-height: 1.02;
-  --text-h1: 2.25rem;
-  --text-h1--line-height: 1.1;
-  --text-h2: 1.625rem;
-  --text-h2--line-height: 1.2;
+  --text-display: 3.5rem;
+  --text-display--line-height: 1;
+  --text-h1: 2.375rem;
+  --text-h1--line-height: 1.08;
+  --text-h2: 1.75rem;
+  --text-h2--line-height: 1.18;
   --text-h3: 1.25rem;
   --text-h3--line-height: 1.3;
   --text-body: 1.0625rem;
@@ -154,14 +240,63 @@
   --text-micro: 0.8125rem;
   --text-micro--line-height: 1.4;
 
-  --radius-soft: 1.25rem;
+  --radius-soft: 1.5rem;
+  --radius-card: 2rem;
   --radius-pill: 999px;
   --shadow-meep: var(--shadow);
   --shadow-gentle: var(--shadow-soft);
+  --shadow-lift: var(--shadow-lift);
 
-  /* Motion tokens: slow, eased, never bouncy unless it means something. */
   --ease-calm: cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-halo: halo 6s var(--ease-calm) infinite;
+  --animate-drift: drift 14s ease-in-out infinite;
+  --animate-sway: sway 7s ease-in-out infinite;
+  --animate-rise: rise 0.9s var(--ease-settle) both;
+
+  @keyframes halo {
+    0% {
+      transform: scale(0.92);
+      opacity: 0.55;
+    }
+    70% {
+      transform: scale(1.22);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1.22);
+      opacity: 0;
+    }
+  }
+  @keyframes drift {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(14px, -10px, 0);
+    }
+  }
+  @keyframes sway {
+    0%,
+    100% {
+      transform: rotate(-2.5deg);
+    }
+    50% {
+      transform: rotate(2.5deg);
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 html {
@@ -170,8 +305,8 @@ html {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
 }
-
 html[data-text="large"] {
   font-size: 112.5%;
 }
@@ -183,24 +318,39 @@ body {
   margin: 0;
   min-height: 100dvh;
   background: var(--background);
-  /* A whisper of paper grain and sunrise — not a gradient show. */
-  background-image:
-    radial-gradient(60rem 40rem at 110% -10%, color-mix(in srgb, var(--sunrise-soft) 70%, transparent), transparent 60%),
-    radial-gradient(50rem 30rem at -20% 110%, color-mix(in srgb, var(--accent-soft) 60%, transparent), transparent 60%);
-  background-attachment: fixed;
+}
+
+/* Fine paper grain over everything — texture, not decoration. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.06;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.28 0 0 0 0 0.22 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+:root[data-theme="dark"] body::after {
+  mix-blend-mode: soft-light;
+  opacity: 0.12;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body::after {
+    mix-blend-mode: soft-light;
+    opacity: 0.12;
+  }
 }
 
 body[data-mode="grounding"] {
   background: var(--grounding);
-  background-image: none;
 }
 
 :focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 3px;
-  border-radius: 12px;
+  border-radius: 14px;
 }
-
 ::selection {
   background: var(--accent-soft);
 }
@@ -231,7 +381,22 @@ body[data-mode="grounding"] {
   border: 0;
 }
 
-/* Reduced motion: honoured from the OS and from MERA's own setting. */
+/* Frosted card: used sparingly over the sky and hills. */
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -250,6 +415,17 @@ html[data-motion="reduced"] *::after {
   transition-duration: 0.01ms !important;
 }
 
-.tabular {
-  font-variant-numeric: tabular-nums;
+/* Primary action: moss with a soft light from above. */
+.btn-primary {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 82%, white) 0%, var(--accent) 45%, var(--accent-strong) 100%);
+  color: var(--accent-contrast);
+  box-shadow: var(--shadow-lift);
+}
+.btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+/* Page hero: a small window onto MERA's sky. */
+.page-hero {
+  background: radial-gradient(28rem 14rem at 100% 0%, var(--sun-glow), transparent 70%), linear-gradient(180deg, var(--sky-top), var(--sky-low));
 }

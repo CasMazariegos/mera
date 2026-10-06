@@ -13,6 +13,8 @@ import { completedResets } from "@/data/db";
 import { cue } from "@/lib/cues";
 import { setBeforePhoto } from "@/store/photos";
 import type { GeneratedMission } from "@/types";
+import { CATEGORY_ICON, CATEGORY_LABEL, CATEGORY_TINT, ENVIRONMENT_ICON, ENVIRONMENT_LABEL, Sparkles } from "@/components/icons";
+import { ProgressRing } from "@/components/Scenery";
 import { Scene } from "../Scene";
 
 const SOURCE_NOTE: Record<GeneratedMission["source"], string> = {
@@ -99,16 +101,74 @@ export function MissionReadyScene() {
         </>
       }
     >
-      <Eyebrow>Your reset</Eyebrow>
-      <h1 id="mission-title" tabIndex={-1} className="mt-3 font-display text-h1 font-medium tracking-tight text-ink" data-testid="mission-title">
-        {mission.title}
-      </h1>
-      <p className="mt-5 text-h2 leading-snug text-balance text-ink">{mission.instruction}</p>
-      {mission.secondaryInstruction && <p className="mt-3 text-body text-ink-2">{mission.secondaryInstruction}</p>}
-      <p className="mt-6 inline-flex items-center rounded-full bg-accent-soft px-4 py-2 text-small font-semibold tracking-[0.12em] text-ink uppercase">
-        {timing.phoneDownMs ? `${Math.round(timing.phoneDownMs / 1000)} seconds (demo)` : `${mission.durationMinutes} minutes`}
-      </p>
-      <p className="mt-6 text-micro text-muted" data-testid="mission-source">
+      {(() => {
+        const CatIcon = CATEGORY_ICON[mission.category];
+        const EnvIcon = ENVIRONMENT_ICON[mission.environment];
+        const seconds = timing.phoneDownMs ? Math.round(timing.phoneDownMs / 1000) : null;
+        return (
+          <motion.article
+            initial={{ opacity: 0, y: 18, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="glass relative w-full overflow-hidden rounded-[var(--radius-card)] text-left shadow-lift"
+          >
+            {/* Ticket header: the kind of reset, as a small window of colour. */}
+            <div className="flex items-center justify-between px-6 pt-6 pb-5" style={{ background: CATEGORY_TINT[mission.category] }}>
+              <div>
+                <Eyebrow>Your reset</Eyebrow>
+                <p className="mt-1 inline-flex items-center gap-1.5 text-small font-semibold text-ink">
+                  <CatIcon aria-hidden className="size-4" strokeWidth={1.75} /> {CATEGORY_LABEL[mission.category]}
+                </p>
+              </div>
+              <span className="relative inline-flex size-16 items-center justify-center rounded-full bg-surface/80 shadow-gentle">
+                <svg aria-hidden viewBox="0 0 64 64" className="absolute inset-0 -rotate-90">
+                  <circle cx="32" cy="32" r="29" fill="none" stroke="var(--border)" strokeWidth="3" />
+                  <circle
+                    cx="32"
+                    cy="32"
+                    r="29"
+                    fill="none"
+                    stroke="var(--accent)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeDasharray={182}
+                    strokeDashoffset={182 * (1 - Math.min(1, (seconds ? 1 : mission.durationMinutes) / (seconds ? 1 : 10)))}
+                  />
+                </svg>
+                <span className="relative text-center leading-none">
+                  <span className="block font-display text-h3 text-ink tabular">{seconds ?? mission.durationMinutes}</span>
+                  <span className="block text-[0.625rem] font-semibold tracking-[0.12em] text-ink-2 uppercase">{seconds ? "sec" : "min"}</span>
+                </span>
+              </span>
+            </div>
+            {/* Perforation */}
+            <div aria-hidden className="relative h-0 border-t-2 border-dashed border-line">
+              <span className="absolute -top-3 -left-3 size-6 rounded-full bg-grounding" />
+              <span className="absolute -top-3 -right-3 size-6 rounded-full bg-grounding" />
+            </div>
+            <div className="px-6 pt-5 pb-6">
+              <h1
+                id="mission-title"
+                tabIndex={-1}
+                className="font-display text-h1 font-medium tracking-tight text-ink outline-none"
+                data-testid="mission-title"
+              >
+                {mission.title}
+              </h1>
+              <p className="mt-3 text-h3 leading-snug text-balance text-ink">{mission.instruction}</p>
+              {mission.secondaryInstruction && <p className="mt-2 text-body text-ink-2">{mission.secondaryInstruction}</p>}
+              <div className="mt-5 flex flex-wrap items-center gap-2 text-micro font-semibold text-ink-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-surface/80 px-3 py-1.5">
+                  <EnvIcon aria-hidden className="size-3.5" strokeWidth={2} /> {ENVIRONMENT_LABEL[mission.environment]}
+                </span>
+                {seconds && <span className="rounded-full bg-sunrise-soft px-3 py-1.5 text-ink">Demo timer</span>}
+              </div>
+            </div>
+          </motion.article>
+        );
+      })()}
+      <p className="mt-5 inline-flex items-center gap-1.5 text-micro text-ink-2" data-testid="mission-source">
+        <Sparkles aria-hidden className="size-3.5" />
         {SOURCE_NOTE[mission.source]} · {statusLabel(mission.source === "library" ? "fallback" : mission.source)}
       </p>
       <button type="button" className="mt-2 min-h-11 text-micro text-muted underline underline-offset-4" onClick={() => fileRef.current?.click()}>
@@ -184,7 +244,9 @@ export function PhoneDownScene() {
         <h1 id="handoff" tabIndex={-1} className="sr-only">
           Good. Now put me away. Go touch grass. I’ll be here when you get back.
         </h1>
-        <MeraCharacter state={beat >= 2 ? "walking" : "listening"} size={120} />
+        <motion.div animate={beat >= 2 && !reducedMotion ? { x: 60, opacity: 0.85 } : { x: 0, opacity: 1 }} transition={{ duration: 3, ease: "easeInOut" }}>
+          <MeraCharacter state={beat >= 2 ? "walking" : "listening"} size={120} />
+        </motion.div>
         <div className="mt-10 min-h-40" aria-hidden>
           <AnimatePresence mode="wait">
             {beat === 0 && (
@@ -234,12 +296,17 @@ export function PhoneDownScene() {
         Phone down. {mmss(left)} left. You don’t need to look at me.
       </h1>
       <div aria-hidden className="flex flex-col items-center">
-        <p className="font-display text-[4.5rem] leading-none font-light text-ink-2 tabular" data-testid="countdown">
-          {mmss(left)}
-        </p>
-        <div className="mt-10 opacity-70">
-          <MeraCharacter state="resting" size={44} still />
-        </div>
+        <ProgressRing value={1 - Math.max(0, left) / Math.max(1, endsAt - startedAt)} size={270} stroke={2}>
+          <div className="flex flex-col items-center">
+            <p className="font-display text-[4.25rem] leading-none font-light text-ink-2 tabular" data-testid="countdown">
+              {mmss(left)}
+            </p>
+            <div className="mt-6 opacity-70">
+              <MeraCharacter state="resting" size={40} still />
+            </div>
+          </div>
+        </ProgressRing>
+        <p className="mt-8 text-small text-muted">You don’t need to look at me.</p>
       </div>
       <div className="flex flex-wrap items-center justify-center gap-2 text-small">
         <button

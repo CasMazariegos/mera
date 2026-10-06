@@ -1,4 +1,5 @@
 /** A lightweight check-in: one tap, an optional "how heavy", and an optional 2-minute reset. */
+import { HeartHandshake } from "lucide-react";
 import { useState } from "react";
 import { Button, Page } from "@/components/ui";
 import { db, completedResets, newId } from "@/data/db";
@@ -42,7 +43,7 @@ export function CheckIn() {
 
   if (saved) {
     return (
-      <Page eyebrow="Check in" title="Noted." intro="Thanks for checking in with yourself.">
+      <Page icon={HeartHandshake} eyebrow="Check in" title="Noted." intro="Thanks for checking in with yourself.">
         <div className="flex flex-col gap-3">
           <Button onClick={() => void quickReset()} disabled={busy} data-testid="quick-reset">
             {busy ? "Finding one…" : "Want a 2-minute reset?"}
@@ -56,7 +57,7 @@ export function CheckIn() {
   }
 
   return (
-    <Page eyebrow="Check in" title="How are you feeling?">
+    <Page icon={HeartHandshake} eyebrow="Check in" title="How are you feeling?">
       <div className="grid grid-cols-2 gap-3" role="group" aria-label="Feelings">
         {EMOTIONS.map((e) => (
           <button

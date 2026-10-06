@@ -1,4 +1,5 @@
 /** Daily Reset: one small proactive thing, before overwhelm. No streaks. */
+import { Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button, Page } from "@/components/ui";
 import { meraAI } from "@/ai";
@@ -36,7 +37,7 @@ export function DailyReset() {
   }, []);
 
   return (
-    <Page eyebrow="Daily reset" title="One small thing." intro="Then back to your day.">
+    <Page icon={Sun} eyebrow="Daily reset" title="One small thing." intro="Then back to your day.">
       {mission ? (
         <div className="rounded-[var(--radius-soft)] border border-line bg-surface p-6" data-testid="daily-mission">
           <p className="font-display text-h2 text-ink">{mission.title}</p>

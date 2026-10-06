@@ -1,4 +1,5 @@
 /** Privacy & AI: what runs where, what leaves the device (and when), and full control of your data. */
+import { ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button, Page, Segmented, Toggle } from "@/components/ui";
 import { useSettings, type AiMode } from "@/store/settings";
@@ -139,6 +140,7 @@ export function SettingsPage() {
 
   return (
     <Page
+      icon={ShieldCheck}
       eyebrow="Settings"
       title="Privacy & AI"
       intro={

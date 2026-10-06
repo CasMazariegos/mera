@@ -1,4 +1,5 @@
 /** About / Challenge page. */
+import { Leaf } from "lucide-react";
 import { Page } from "@/components/ui";
 import { MeraCharacter } from "@/components/MeraCharacter";
 
@@ -13,7 +14,7 @@ function Block({ title, children }: { title: string; children: React.ReactNode }
 
 export function AboutPage() {
   return (
-    <Page eyebrow="Meep Emotional Reset Assistant" title="MERA" intro="Come back to yourself. Your Meep for the moments that feel like too much.">
+    <Page icon={Leaf} eyebrow="Meep Emotional Reset Assistant" title="MERA" intro="Come back to yourself. Your Meep for the moments that feel like too much.">
       <MeraCharacter state="resting" size={96} />
       <p className="mt-6 text-small text-ink-2">Built for Hacktoberfest 2026 — Touch Grass. By Cass - NextRealm Interactive.</p>
 
