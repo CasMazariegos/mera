@@ -1,0 +1,33 @@
+# Render Blueprint — one web service hosts the MERA PWA and its small API.
+# Connect the GitHub repo in Render (New → Blueprint); nothing else is manual.
+services:
+  - type: web
+    name: mera
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: APP_ENV
+        value: production
+      # Local Gemma runs in each visitor's browser; nothing to configure server-side.
+      - key: ENABLE_LOCAL_AI
+        value: "true"
+      # Connected AI (opt-in for visitors) — off until you set an endpoint.
+      - key: ENABLE_REMOTE_AI
+        value: "false"
+      - key: MODEL_MODE
+        value: local-first
+      # OpenAI-compatible Gemma endpoint, e.g. https://generativelanguage.googleapis.com/v1beta/openai
+      - key: MODEL_ENDPOINT
+        sync: false
+      # e.g. gemma-3-27b-it
+      - key: MODEL_NAME
+        sync: false
+      # Secret — set in the Render dashboard, never committed.
+      - key: MODEL_API_KEY
+        sync: false

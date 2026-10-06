@@ -1,0 +1,54 @@
+/**
+ * The deterministic reset library. Always available — offline, without AI, and
+ * as the fallback when a model's output fails validation. Every entry passes the
+ * same safety rules the AI does (see missions.test.ts).
+ */
+import type { Emotion, Environment, MissionCategory } from "@/types";
+
+export interface LibraryMission {
+  id: string;
+  title: string;
+  category: MissionCategory;
+  environment: Environment;
+  durationMinutes: number;
+  instruction: string;
+  secondaryInstruction?: string;
+  /** Emotions this tends to suit (empty = any). */
+  emotions: Emotion[];
+  /** Accessibility flags. */
+  needsWalking?: boolean;
+  usesSound?: boolean;
+  usesSmell?: boolean;
+  /** Fine after dark (indoors, or right at the door). */
+  nightSafe?: boolean;
+}
+
+export const LIBRARY: LibraryMission[] = [
+  // NATURE
+  { id: "nature-greens-001", title: "Find Three Greens", category: "nature", environment: "outdoor", durationMinutes: 5, instruction: "Step outside and find three different shades of green.", secondaryInstruction: "Stay with each one for a slow breath.", emotions: ["overwhelmed", "scattered", "not_sure"] },
+  { id: "nature-sky-002", title: "Under Open Sky", category: "nature", environment: "outdoor", durationMinutes: 5, instruction: "Sit or stand somewhere you can see open sky.", secondaryInstruction: "Watch it for a while without trying to do anything.", emotions: ["sad", "drained", "overwhelmed"] },
+  { id: "nature-textures-003", title: "Three Natural Textures", category: "nature", environment: "outdoor", durationMinutes: 5, instruction: "Find three natural textures you can safely touch — bark, a leaf, grass, a stone.", secondaryInstruction: "Notice how each one feels different.", emotions: ["scattered", "anxious", "overstimulated"] },
+  { id: "nature-wind-004", title: "Watch the Wind", category: "nature", environment: "outdoor", durationMinutes: 4, instruction: "Step outside and find leaves, grass or clouds moving in the wind.", secondaryInstruction: "Follow one movement until it stops.", emotions: ["angry", "anxious", "overwhelmed"] },
+  { id: "nature-growing-005", title: "Something Growing", category: "nature", environment: "either", durationMinutes: 3, instruction: "Find something that's growing — a plant, a weed, a tree.", secondaryInstruction: "Look closely at one leaf.", emotions: ["sad", "drained", "not_sure"], nightSafe: true },
+  // MOVEMENT
+  { id: "move-slow-walk-001", title: "A Slow Five", category: "movement", environment: "outdoor", durationMinutes: 5, instruction: "Take a slow five-minute walk somewhere familiar and safe.", secondaryInstruction: "Notice each foot touching the ground.", emotions: ["angry", "anxious", "scattered", "overwhelmed"], needsWalking: true },
+  { id: "move-block-002", title: "Around the Block", category: "movement", environment: "outdoor", durationMinutes: 8, instruction: "Walk around your block, or a familiar loop, at an easy pace.", secondaryInstruction: "Leave your phone in your pocket the whole way.", emotions: ["angry", "drained", "scattered"], needsWalking: true },
+  { id: "move-stretch-003", title: "Stretch Outside", category: "movement", environment: "outdoor", durationMinutes: 4, instruction: "Step outside and stretch your arms up slowly, then let them fall.", secondaryInstruction: "Do it a few times, as gently as you like.", emotions: ["drained", "sad", "overwhelmed"] },
+  { id: "move-room-004", title: "Another Room", category: "movement", environment: "indoor", durationMinutes: 3, instruction: "Leave your phone here and walk slowly into another room.", secondaryInstruction: "Notice the light and the temperature when you arrive.", emotions: ["overstimulated", "overwhelmed", "angry"], needsWalking: true, nightSafe: true },
+  { id: "move-feet-005", title: "Feel Your Feet", category: "movement", environment: "either", durationMinutes: 3, instruction: "Stand up and shift your weight slowly from one foot to the other.", secondaryInstruction: "Feel the floor pressing back.", emotions: ["anxious", "scattered", "overwhelmed"], nightSafe: true },
+  // SENSORY
+  { id: "sense-movement-001", title: "Find the Movement", category: "sensory", environment: "outdoor", durationMinutes: 5, instruction: "Step outside and notice three things around you that are moving.", secondaryInstruction: "Let your attention stay with each one for a few seconds.", emotions: ["overwhelmed", "scattered", "anxious"] },
+  { id: "sense-near-far-002", title: "Near and Far", category: "sensory", environment: "either", durationMinutes: 4, instruction: "Listen for the farthest sound you can hear, then the nearest.", secondaryInstruction: "Go back and forth a few times.", emotions: ["anxious", "overwhelmed", "scattered"], usesSound: true, nightSafe: true },
+  { id: "sense-temperature-003", title: "Air on Your Skin", category: "sensory", environment: "outdoor", durationMinutes: 3, instruction: "Step outside and notice the temperature of the air on your face and hands.", emotions: ["overstimulated", "angry", "drained"] },
+  { id: "sense-shadows-004", title: "Light and Shadow", category: "sensory", environment: "either", durationMinutes: 4, instruction: "Find where light falls and where shadows are, around you.", secondaryInstruction: "Notice one edge where they meet.", emotions: ["sad", "not_sure", "scattered"], nightSafe: true },
+  { id: "sense-textures-005", title: "Five Textures", category: "sensory", environment: "either", durationMinutes: 4, instruction: "Touch five different textures near you, one at a time.", secondaryInstruction: "Rough, smooth, soft, cool, warm — anything counts.", emotions: ["anxious", "overstimulated", "scattered"], nightSafe: true },
+  { id: "sense-fresh-air-006", title: "Fresh Air", category: "sensory", environment: "either", durationMinutes: 3, instruction: "Find fresh air — a doorway, a balcony, or an open window.", secondaryInstruction: "Take five slow breaths of it.", emotions: ["overwhelmed", "angry", "overstimulated", "drained"], nightSafe: true },
+  { id: "sense-scents-007", title: "Two Scents", category: "sensory", environment: "either", durationMinutes: 3, instruction: "Find two things with a scent — tea, soap, a plant, fresh air.", emotions: ["sad", "drained", "not_sure"], usesSmell: true, nightSafe: true },
+  // INDOOR
+  { id: "indoor-window-001", title: "Open a Window", category: "indoor", environment: "indoor", durationMinutes: 3, instruction: "Open a window and stand near it for a few minutes.", secondaryInstruction: "Notice what the air brings in.", emotions: ["overwhelmed", "overstimulated", "angry", "not_sure"], nightSafe: true },
+  { id: "indoor-light-002", title: "Near the Light", category: "indoor", environment: "indoor", durationMinutes: 3, instruction: "Sit or stand near natural light, or the softest light you have.", secondaryInstruction: "Let your eyes rest on something far away.", emotions: ["sad", "drained", "not_sure"], nightSafe: true },
+  { id: "indoor-plant-003", title: "Water a Plant", category: "indoor", environment: "indoor", durationMinutes: 3, instruction: "Water a plant slowly, or just look closely at one.", secondaryInstruction: "Notice the soil, the stems, the color.", emotions: ["sad", "drained", "scattered"], nightSafe: true },
+  { id: "indoor-cool-water-004", title: "Cool Water", category: "indoor", environment: "indoor", durationMinutes: 2, instruction: "Hold your hands under cool water for a moment.", secondaryInstruction: "Notice the temperature and how it changes.", emotions: ["angry", "overstimulated", "anxious"], nightSafe: true },
+  { id: "indoor-object-005", title: "One Object", category: "indoor", environment: "indoor", durationMinutes: 3, instruction: "Pick up one object near you and look at it closely.", secondaryInstruction: "Its weight, edges, colors, temperature.", emotions: ["scattered", "anxious", "not_sure"], nightSafe: true },
+  { id: "indoor-doorway-006", title: "At the Door", category: "indoor", environment: "indoor", durationMinutes: 2, instruction: "Step to your doorway, balcony or porch if it feels safe, and look at the sky.", emotions: ["overwhelmed", "drained", "sad"], nightSafe: true },
+];

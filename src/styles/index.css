@@ -1,0 +1,255 @@
+@import "tailwindcss";
+@import "@fontsource-variable/figtree";
+@import "@fontsource-variable/fraunces";
+
+/*
+ * MERA design tokens.
+ * Palette: warm sand, stone, fog, moss, sage, muted sky, soft sunrise, charcoal.
+ * Green is an accent, not the whole room. The deeper someone goes into a reset,
+ * the quieter the screen gets (see [data-mode="grounding"]).
+ */
+:root {
+  --background: #f4f0e8; /* warm sand */
+  --surface: #fbf9f4; /* paper */
+  --surface-elevated: #ffffff;
+  --surface-sunk: #ebe5d9; /* sand, one step down */
+  --text-primary: #23261f; /* charcoal moss */
+  --text-secondary: #5e6257; /* stone (6.0:1 on sand) */
+  --text-muted: #6e7166; /* 4.6:1 on sand */
+  --accent: #4a5d3f; /* moss — 7.1:1 on sand */
+  --accent-contrast: #f8f6ef;
+  --accent-soft: #dfe5d3; /* sage wash */
+  --sky: #8ea4b3; /* muted sky */
+  --sky-soft: #dde5ea;
+  --sunrise: #e9b98f; /* soft sunrise */
+  --sunrise-soft: #f6e3d1;
+  --grounding: #e8e3d8; /* fog — grounding scenes */
+  --success: #3f6b4a;
+  --warning: #8a5a1c;
+  --border: #d8d1c3;
+  --border-strong: #b9b1a1;
+  --focus: #2f5d8a;
+  --shadow: 0 1px 2px rgb(48 42 30 / 0.06), 0 8px 28px rgb(48 42 30 / 0.08);
+  --shadow-soft: 0 1px 1px rgb(48 42 30 / 0.04), 0 4px 14px rgb(48 42 30 / 0.06);
+
+  /* Meep (MERA variant): stone-sage body, moss sprout, sunrise cheeks. */
+  --meep-body: #c8cdbd;
+  --meep-body-shade: #b3b9a6;
+  --meep-sprout: #6b8a55;
+  --meep-cheek: #eeb3a0;
+  --meep-ink: #26291f;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #171915;
+    --surface: #1f221d;
+    --surface-elevated: #272a24;
+    --surface-sunk: #131511;
+    --text-primary: #ece9e0;
+    --text-secondary: #b7b6ab;
+    --text-muted: #a3a397;
+    --accent: #b4c99f;
+    --accent-contrast: #182014;
+    --accent-soft: #2c3527;
+    --sky: #9db3c2;
+    --sky-soft: #24303a;
+    --sunrise: #e2b48c;
+    --sunrise-soft: #3a2c21;
+    --grounding: #1b1d19;
+    --success: #9cc9a5;
+    --warning: #e3b678;
+    --border: #34382f;
+    --border-strong: #4a4f43;
+    --focus: #9cc3ea;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 28px rgb(0 0 0 / 0.35);
+    --shadow-soft: 0 1px 1px rgb(0 0 0 / 0.3), 0 4px 14px rgb(0 0 0 / 0.25);
+    --meep-body: #a9ae9f;
+    --meep-body-shade: #959a8b;
+    --meep-sprout: #8fb07a;
+    --meep-cheek: #d99c8b;
+    --meep-ink: #1a1c17;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --background: #171915;
+  --surface: #1f221d;
+  --surface-elevated: #272a24;
+  --surface-sunk: #131511;
+  --text-primary: #ece9e0;
+  --text-secondary: #b7b6ab;
+  --text-muted: #a3a397;
+  --accent: #b4c99f;
+  --accent-contrast: #182014;
+  --accent-soft: #2c3527;
+  --sky: #9db3c2;
+  --sky-soft: #24303a;
+  --sunrise: #e2b48c;
+  --sunrise-soft: #3a2c21;
+  --grounding: #1b1d19;
+  --success: #9cc9a5;
+  --warning: #e3b678;
+  --border: #34382f;
+  --border-strong: #4a4f43;
+  --focus: #9cc3ea;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 28px rgb(0 0 0 / 0.35);
+  --shadow-soft: 0 1px 1px rgb(0 0 0 / 0.3), 0 4px 14px rgb(0 0 0 / 0.25);
+  --meep-body: #a9ae9f;
+  --meep-body-shade: #959a8b;
+  --meep-sprout: #8fb07a;
+  --meep-cheek: #d99c8b;
+  --meep-ink: #1a1c17;
+  color-scheme: dark;
+}
+
+/* High contrast: stronger text and borders, no soft washes. */
+:root[data-contrast="more"] {
+  --text-secondary: var(--text-primary);
+  --text-muted: var(--text-primary);
+  --border: var(--text-secondary);
+  --border-strong: var(--text-primary);
+}
+
+@theme inline {
+  --color-bg: var(--background);
+  --color-surface: var(--surface);
+  --color-elevated: var(--surface-elevated);
+  --color-sunk: var(--surface-sunk);
+  --color-ink: var(--text-primary);
+  --color-ink-2: var(--text-secondary);
+  --color-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--accent-contrast);
+  --color-accent-soft: var(--accent-soft);
+  --color-sky: var(--sky);
+  --color-sky-soft: var(--sky-soft);
+  --color-sunrise: var(--sunrise);
+  --color-sunrise-soft: var(--sunrise-soft);
+  --color-grounding: var(--grounding);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+
+  --font-sans: "Figtree Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
+
+  /* Type scale (rem; scales with the person's text size). */
+  --text-display: 3.25rem;
+  --text-display--line-height: 1.02;
+  --text-h1: 2.25rem;
+  --text-h1--line-height: 1.1;
+  --text-h2: 1.625rem;
+  --text-h2--line-height: 1.2;
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.3;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.55;
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.5;
+  --text-micro: 0.8125rem;
+  --text-micro--line-height: 1.4;
+
+  --radius-soft: 1.25rem;
+  --radius-pill: 999px;
+  --shadow-meep: var(--shadow);
+  --shadow-gentle: var(--shadow-soft);
+
+  /* Motion tokens: slow, eased, never bouncy unless it means something. */
+  --ease-calm: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html {
+  background: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html[data-text="large"] {
+  font-size: 112.5%;
+}
+html[data-text="larger"] {
+  font-size: 125%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--background);
+  /* A whisper of paper grain and sunrise — not a gradient show. */
+  background-image:
+    radial-gradient(60rem 40rem at 110% -10%, color-mix(in srgb, var(--sunrise-soft) 70%, transparent), transparent 60%),
+    radial-gradient(50rem 30rem at -20% 110%, color-mix(in srgb, var(--accent-soft) 60%, transparent), transparent 60%);
+  background-attachment: fixed;
+}
+
+body[data-mode="grounding"] {
+  background: var(--grounding);
+  background-image: none;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Reduced motion: honoured from the OS and from MERA's own setting. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
