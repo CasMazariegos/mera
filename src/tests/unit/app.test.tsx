@@ -9,7 +9,7 @@ import { initialState } from "@/features/grounding/machine";
 beforeEach(() => {
   localStorage.clear();
   useFlow.setState({ flow: initialState });
-  useSettings.setState({ reducedMotion: "system", demo: false, aiMode: "off" });
+  useSettings.setState({ reducedMotion: "system", demo: false, aiMode: "off", onboarded: true });
   location.hash = "";
 });
 

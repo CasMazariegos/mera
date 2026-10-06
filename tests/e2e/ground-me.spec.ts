@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
   await page.evaluate(() =>
     localStorage.setItem(
       "mera.settings",
-      JSON.stringify({ state: { demo: true, aiMode: "off", canGoOutside: "yes", usualMinutes: 5, sound: false, haptics: false }, version: 1 }),
+      JSON.stringify({ state: { demo: true, aiMode: "off", canGoOutside: "yes", usualMinutes: 5, sound: false, haptics: false, onboarded: true }, version: 1 }),
     ),
   );
   await page.reload();
@@ -66,4 +66,31 @@ test("privacy controls: delete all data", async ({ page }) => {
   await page.getByTestId("delete-all").click();
   await page.getByTestId("delete-all-confirm").click();
   await expect(page.getByText("All MERA data on this device was deleted.")).toBeVisible();
+});
+
+test.describe("first visit", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+  });
+
+  test("welcome explains MERA, then get started sets preferences and lands on Home", async ({ page }) => {
+    await expect(page.getByTestId("welcome")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /How a reset works|About five minutes/ })).toBeVisible();
+    await page.getByTestId("get-started").click();
+    await page.getByTestId("option-indoor_only").click();
+    await page.getByTestId("option-2").click();
+    await page.getByTestId("option-off").click();
+    await expect(page.getByRole("heading", { name: "You’re all set." })).toBeVisible();
+    await page.getByTestId("finish-setup").click();
+    await expect(page.getByRole("heading", { level: 1, name: "Come back to yourself." })).toBeVisible();
+    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("mera.settings") ?? "{}").state);
+    expect(saved).toMatchObject({ onboarded: true, canGoOutside: "indoor_only", usualMinutes: 2, aiMode: "off" });
+  });
+
+  test("GROUND ME is still one tap away on the welcome page", async ({ page }) => {
+    await page.getByRole("button", { name: "I need it right now" }).click();
+    await expect(page.getByRole("heading", { name: "I’m here." })).toBeVisible();
+  });
 });

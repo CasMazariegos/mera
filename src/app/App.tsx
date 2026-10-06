@@ -11,6 +11,8 @@ import { PatternsPage } from "@/features/patterns/PatternsPage";
 import { JournalPage } from "@/features/journal/JournalPage";
 import { SettingsPage } from "@/features/settings/SettingsPage";
 import { AboutPage } from "@/features/about/AboutPage";
+import { Welcome } from "@/features/welcome/Welcome";
+import { GetStarted } from "@/features/welcome/GetStarted";
 import { GroundMeFab } from "@/components/GroundMe";
 import { daypart } from "@/lib/daypart";
 
@@ -66,6 +68,7 @@ export function App() {
   const step = useFlow((s) => s.flow.step);
   const reduce = useSettings((s) => s.reducedMotion === "reduce");
   const demo = useSettings((s) => s.demo);
+  const onboarded = useSettings((s) => s.onboarded);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -111,7 +114,16 @@ export function App() {
       )}
       {/* While a reset runs, the rest of the app is hidden from view and from assistive tech. */}
       <div aria-hidden={inFlow || undefined} inert={inFlow || undefined} className={inFlow ? "hidden" : undefined}>
-        {page ? <SubPage>{page}</SubPage> : <Home />}
+        {page ? (
+          <SubPage>{page}</SubPage>
+        ) : route === "/start" ? (
+          <GetStarted />
+        ) : route === "/welcome" || !onboarded ? (
+          // First visit: explain MERA before anything else (GROUND ME is still one tap away on it).
+          <Welcome />
+        ) : (
+          <Home />
+        )}
       </div>
       {inFlow && <GroundFlow />}
     </MotionConfig>

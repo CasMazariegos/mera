@@ -25,7 +25,10 @@ for (const scheme of ["light", "dark"] as const) {
   await page.evaluate(() => {
     localStorage.setItem(
       "mera.settings",
-      JSON.stringify({ state: { demo: true, aiMode: "off", canGoOutside: "ask_each_time", usualMinutes: 5, sound: false, haptics: false }, version: 1 }),
+      JSON.stringify({
+        state: { demo: true, aiMode: "off", canGoOutside: "ask_each_time", usualMinutes: 5, sound: false, haptics: false, onboarded: true },
+        version: 1,
+      }),
     );
   });
   await page.reload();

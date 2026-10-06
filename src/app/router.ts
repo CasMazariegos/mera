@@ -1,7 +1,7 @@
 /** A tiny hash router: a handful of screens, deep-linkable, works offline and on any static host. */
 import { useSyncExternalStore } from "react";
 
-export const ROUTES = ["/", "/daily", "/check-in", "/patterns", "/journal", "/settings", "/about"] as const;
+export const ROUTES = ["/", "/daily", "/check-in", "/patterns", "/journal", "/settings", "/about", "/welcome", "/start"] as const;
 export type Route = (typeof ROUTES)[number];
 
 function current(): Route {
