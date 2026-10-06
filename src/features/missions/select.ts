@@ -75,5 +75,10 @@ export function examplesFor(req: MissionRequest, n = 2): LibraryMission[] {
 }
 
 export function categoryCounts(): Record<MissionCategory, number> {
-  return LIBRARY.reduce<Record<MissionCategory, number>>((acc, m) => ({ ...acc, [m.category]: (acc[m.category] ?? 0) + 1 }), { nature: 0, movement: 0, sensory: 0, indoor: 0 });
+  return LIBRARY.reduce<Record<MissionCategory, number>>((acc, m) => ({ ...acc, [m.category]: (acc[m.category] ?? 0) + 1 }), {
+    nature: 0,
+    movement: 0,
+    sensory: 0,
+    indoor: 0,
+  });
 }

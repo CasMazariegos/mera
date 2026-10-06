@@ -80,7 +80,10 @@ export function GroundFlow() {
             className="fixed top-[max(1rem,env(safe-area-inset-top))] left-4 z-10 inline-flex min-h-11 items-center rounded-full px-4 text-small font-medium text-muted hover:text-ink"
             data-testid="exit-flow"
           >
-            <span aria-hidden className="mr-1.5">←</span> Exit
+            <span aria-hidden className="mr-1.5">
+              ←
+            </span>{" "}
+            Exit
           </button>
         )}
         <AnimatePresence mode="wait">

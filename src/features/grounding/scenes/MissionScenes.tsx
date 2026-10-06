@@ -188,12 +188,26 @@ export function PhoneDownScene() {
         <div className="mt-10 min-h-40" aria-hidden>
           <AnimatePresence mode="wait">
             {beat === 0 && (
-              <motion.p key="good" className="font-display text-display text-ink" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
+              <motion.p
+                key="good"
+                className="font-display text-display text-ink"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+              >
                 Good.
               </motion.p>
             )}
             {beat === 1 && (
-              <motion.p key="away" className="font-display text-h1 text-ink" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
+              <motion.p
+                key="away"
+                className="font-display text-h1 text-ink"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+              >
                 Now put me away.
               </motion.p>
             )}
@@ -211,7 +225,11 @@ export function PhoneDownScene() {
 
   const left = endsAt - now;
   return (
-    <section aria-labelledby="pd-title" className="flex min-h-[100dvh] flex-col items-center justify-between px-6 pt-24 pb-[max(2rem,env(safe-area-inset-bottom))] text-center" data-testid="phone-down">
+    <section
+      aria-labelledby="pd-title"
+      className="flex min-h-[100dvh] flex-col items-center justify-between px-6 pt-24 pb-[max(2rem,env(safe-area-inset-bottom))] text-center"
+      data-testid="phone-down"
+    >
       <h1 id="pd-title" className="sr-only">
         Phone down. {mmss(left)} left. You don’t need to look at me.
       </h1>
@@ -224,13 +242,28 @@ export function PhoneDownScene() {
         </div>
       </div>
       <div className="flex flex-wrap items-center justify-center gap-2 text-small">
-        <button type="button" aria-pressed={settings.sound} onClick={() => settings.set({ sound: !settings.sound })} className="min-h-11 rounded-full px-4 text-muted hover:text-ink">
+        <button
+          type="button"
+          aria-pressed={settings.sound}
+          onClick={() => settings.set({ sound: !settings.sound })}
+          className="min-h-11 rounded-full px-4 text-muted hover:text-ink"
+        >
           Audio {settings.sound ? "on" : "off"}
         </button>
-        <button type="button" aria-pressed={settings.haptics} onClick={() => settings.set({ haptics: !settings.haptics })} className="min-h-11 rounded-full px-4 text-muted hover:text-ink">
+        <button
+          type="button"
+          aria-pressed={settings.haptics}
+          onClick={() => settings.set({ haptics: !settings.haptics })}
+          className="min-h-11 rounded-full px-4 text-muted hover:text-ink"
+        >
           Haptics {settings.haptics ? "on" : "off"}
         </button>
-        <button type="button" onClick={() => send({ type: "END_EARLY", now: Date.now() })} className="min-h-11 rounded-full px-4 text-muted underline underline-offset-4 hover:text-ink" data-testid="end-early">
+        <button
+          type="button"
+          onClick={() => send({ type: "END_EARLY", now: Date.now() })}
+          className="min-h-11 rounded-full px-4 text-muted underline underline-offset-4 hover:text-ink"
+          data-testid="end-early"
+        >
           End early
         </button>
       </div>

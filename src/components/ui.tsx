@@ -5,7 +5,12 @@ const cx = (...c: Array<string | false | null | undefined>) => c.filter(Boolean)
 
 type Variant = "primary" | "quiet" | "ghost" | "choice";
 
-export function Button({ variant = "primary", className, children, ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; children: ReactNode }) {
+export function Button({
+  variant = "primary",
+  className,
+  children,
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; children: ReactNode }) {
   return (
     <button
       type="button"
@@ -14,7 +19,8 @@ export function Button({ variant = "primary", className, children, ...props }: B
         variant === "primary" && "bg-accent text-on-accent shadow-gentle hover:brightness-110 active:scale-[0.99]",
         variant === "quiet" && "border border-line-strong bg-surface text-ink hover:bg-elevated",
         variant === "ghost" && "min-h-12 px-4 font-medium text-ink-2 underline-offset-4 hover:text-ink hover:underline",
-        variant === "choice" && "min-h-16 w-full justify-start rounded-[var(--radius-soft)] border border-line bg-surface px-5 text-left text-h3 font-medium text-ink hover:border-line-strong hover:bg-elevated",
+        variant === "choice" &&
+          "min-h-16 w-full justify-start rounded-[var(--radius-soft)] border border-line bg-surface px-5 text-left text-h3 font-medium text-ink hover:border-line-strong hover:bg-elevated",
         className,
       )}
       {...props}
@@ -69,7 +75,10 @@ export function Toggle({ label, hint, checked, onChange, id }: { label: string; 
         aria-checked={checked}
         aria-describedby={hint ? `${id}-hint` : undefined}
         onClick={() => onChange(!checked)}
-        className={cx("relative mt-1 inline-flex h-8 w-14 shrink-0 items-center rounded-full border transition-colors duration-300", checked ? "border-accent bg-accent" : "border-line-strong bg-sunk")}
+        className={cx(
+          "relative mt-1 inline-flex h-8 w-14 shrink-0 items-center rounded-full border transition-colors duration-300",
+          checked ? "border-accent bg-accent" : "border-line-strong bg-sunk",
+        )}
       >
         <span className={cx("ml-1 inline-block size-6 rounded-full bg-elevated shadow-gentle transition-transform duration-300", checked && "translate-x-6")} />
         <span className="sr-only">{checked ? "On" : "Off"}</span>
@@ -78,7 +87,19 @@ export function Toggle({ label, hint, checked, onChange, id }: { label: string; 
   );
 }
 
-export function Segmented<T extends string>({ label, value, options, onChange, name }: { label: string; value: T; options: Array<{ value: T; label: string }>; onChange: (v: T) => void; name: string }) {
+export function Segmented<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+  name,
+}: {
+  label: string;
+  value: T;
+  options: Array<{ value: T; label: string }>;
+  onChange: (v: T) => void;
+  name: string;
+}) {
   return (
     <fieldset className="py-4">
       <legend className="text-body font-medium text-ink">{label}</legend>
@@ -92,7 +113,11 @@ export function Segmented<T extends string>({ label, value, options, onChange, n
             )}
           >
             <input type="radio" className="sr-only" name={name} value={o.value} checked={value === o.value} onChange={() => onChange(o.value)} />
-            {value === o.value && <span aria-hidden className="mr-1.5">✓</span>}
+            {value === o.value && (
+              <span aria-hidden className="mr-1.5">
+                ✓
+              </span>
+            )}
             {o.label}
           </label>
         ))}
@@ -100,4 +125,3 @@ export function Segmented<T extends string>({ label, value, options, onChange, n
     </fieldset>
   );
 }
-

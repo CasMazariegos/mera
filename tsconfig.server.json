@@ -15,5 +15,5 @@
     "noUnusedParameters": true,
     "paths": { "@/*": ["./src/*"] }
   },
-  "include": ["server"]
+  "include": ["server", "src/ai/evaluation"]
 }

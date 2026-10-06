@@ -109,7 +109,8 @@ export function transition(s: FlowState, e: FlowEvent): FlowState {
   switch (s.step) {
     case "IDLE":
       if (e.type === "GROUND_ME") return { ...initialState, step: "INTRO", resetId: e.resetId, startedAt: e.now };
-      if (e.type === "START_MISSION") return { ...initialState, step: "MISSION_READY", resetId: e.resetId, startedAt: e.now, mission: e.mission, emotion: e.emotion ?? null };
+      if (e.type === "START_MISSION")
+        return { ...initialState, step: "MISSION_READY", resetId: e.resetId, startedAt: e.now, mission: e.mission, emotion: e.emotion ?? null };
       return s;
     case "INTRO":
       if (e.type === "START_RESET") return { ...s, step: "BODY_AWARENESS", quiet: e.quiet ?? false };

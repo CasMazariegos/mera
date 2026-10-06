@@ -76,7 +76,16 @@ export function ReflectionScene() {
       <button type="button" className="min-h-11 text-small text-muted underline underline-offset-4" onClick={() => fileRef.current?.click()}>
         {after ? "Photo added (stays on this device)" : "Add a photo of what you found"}
       </button>
-      <input ref={fileRef} type="file" accept="image/*" capture="environment" className="sr-only" tabIndex={-1} aria-hidden onChange={(e) => setAfter(e.target.files?.[0] ?? null)} />
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="sr-only"
+        tabIndex={-1}
+        aria-hidden
+        onChange={(e) => setAfter(e.target.files?.[0] ?? null)}
+      />
     </>
   );
 
@@ -115,7 +124,10 @@ export function ReflectionScene() {
     return (
       <Scene title="Say it out loud">
         <div className="mt-8 w-full">
-          <VoiceRecorder onSave={(audio, mime, seconds) => void save({ kind: "voice", audio, audioMime: mime, durationSeconds: seconds })} onCancel={() => setMode("choose")} />
+          <VoiceRecorder
+            onSave={(audio, mime, seconds) => void save({ kind: "voice", audio, audioMime: mime, durationSeconds: seconds })}
+            onCancel={() => setMode("choose")}
+          />
         </div>
         <div className="mt-3">{photoPicker}</div>
       </Scene>

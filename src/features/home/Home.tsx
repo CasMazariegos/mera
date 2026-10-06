@@ -27,7 +27,12 @@ export function Home() {
         <p className="font-display text-h3 font-semibold tracking-[0.24em] text-ink" aria-label="MERA">
           MERA
         </p>
-        <a href={href("/settings")} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line px-3 text-micro font-semibold tracking-[0.12em] text-ink-2 hover:border-line-strong" title={status.detail} data-testid="ai-status">
+        <a
+          href={href("/settings")}
+          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line px-3 text-micro font-semibold tracking-[0.12em] text-ink-2 hover:border-line-strong"
+          title={status.detail}
+          data-testid="ai-status"
+        >
           <span aria-hidden className={`size-2 rounded-full ${status.label === "OFFLINE RESET" ? "bg-sky" : "bg-accent"}`} />
           {status.label}
           <span className="sr-only">: {status.detail} Open privacy and AI settings.</span>
@@ -46,14 +51,21 @@ export function Home() {
           <ul className="grid grid-cols-2 gap-3">
             {SECONDARY.map((s) => (
               <li key={s.to}>
-                <a href={href(s.to)} className="flex min-h-20 flex-col justify-center rounded-[var(--radius-soft)] border border-line bg-surface/70 px-4 py-3 text-left transition-colors duration-300 hover:border-line-strong hover:bg-surface">
+                <a
+                  href={href(s.to)}
+                  className="flex min-h-20 flex-col justify-center rounded-[var(--radius-soft)] border border-line bg-surface/70 px-4 py-3 text-left transition-colors duration-300 hover:border-line-strong hover:bg-surface"
+                >
                   <span className="text-body font-semibold text-ink">{s.label}</span>
                   <span className="text-micro text-ink-2">{s.hint}</span>
                 </a>
               </li>
             ))}
           </ul>
-          {week > 0 && <p className="mt-6 text-small text-ink-2">You made time for yourself {countWord(week)} {week === 1 ? "time" : "times"} this week.</p>}
+          {week > 0 && (
+            <p className="mt-6 text-small text-ink-2">
+              You made time for yourself {countWord(week)} {week === 1 ? "time" : "times"} this week.
+            </p>
+          )}
           <p className="mt-6 text-micro text-muted">
             <a className="underline underline-offset-4 hover:text-ink" href={href("/settings")}>
               Privacy & AI

@@ -2,7 +2,19 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { motion } from "motion/react";
 
-export function Scene({ title, children, footer, top, labelledBy }: { title?: ReactNode; children?: ReactNode; footer?: ReactNode; top?: ReactNode; labelledBy?: string }) {
+export function Scene({
+  title,
+  children,
+  footer,
+  top,
+  labelledBy,
+}: {
+  title?: ReactNode;
+  children?: ReactNode;
+  footer?: ReactNode;
+  top?: ReactNode;
+  labelledBy?: string;
+}) {
   const ref = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     ref.current?.focus({ preventScroll: true });
@@ -19,7 +31,12 @@ export function Scene({ title, children, footer, top, labelledBy }: { title?: Re
       {top}
       <div className="flex w-full max-w-md flex-1 flex-col items-center justify-center">
         {title && (
-          <h1 id="scene-title" ref={ref} tabIndex={-1} className="font-display text-h1 font-medium tracking-tight text-balance text-ink outline-none sm:text-display">
+          <h1
+            id="scene-title"
+            ref={ref}
+            tabIndex={-1}
+            className="font-display text-h1 font-medium tracking-tight text-balance text-ink outline-none sm:text-display"
+          >
             {title}
           </h1>
         )}

@@ -98,7 +98,11 @@ export function MeraCharacter({
 
         {/* body */}
         <path d="M60 34 C88 34 102 58 102 86 C102 112 84 126 60 126 C36 126 18 112 18 86 C18 58 32 34 60 34 Z" fill="var(--meep-body)" />
-        <path d="M30 98 C38 114 50 120 60 120 C72 120 84 114 92 100 C86 118 74 124 60 124 C44 124 34 116 30 98 Z" fill="var(--meep-body-shade)" opacity="0.55" />
+        <path
+          d="M30 98 C38 114 50 120 60 120 C72 120 84 114 92 100 C86 118 74 124 60 124 C44 124 34 116 30 98 Z"
+          fill="var(--meep-body-shade)"
+          opacity="0.55"
+        />
 
         {/* face */}
         {eyesClosed ? (
@@ -114,7 +118,13 @@ export function MeraCharacter({
         )}
         <ellipse cx="38" cy="90" rx="6" ry="3.6" fill="var(--meep-cheek)" opacity="0.75" />
         <ellipse cx="82" cy="90" rx="6" ry="3.6" fill="var(--meep-cheek)" opacity="0.75" />
-        <path d={state === "celebrating" || state === "returning" ? "M55 91 Q60 95 65 91" : "M56 91 Q60 93 64 91"} stroke="var(--meep-ink)" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+        <path
+          d={state === "celebrating" || state === "returning" ? "M55 91 Q60 95 65 91" : "M56 91 Q60 93 64 91"}
+          stroke="var(--meep-ink)"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          fill="none"
+        />
       </motion.g>
     </motion.svg>
   );

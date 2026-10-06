@@ -23,7 +23,8 @@ export class MeraDB extends Dexie {
 
 export const db = new MeraDB();
 
-export const newId = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+export const newId = () =>
+  typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
 export async function saveReset(r: ResetRecord) {
   await db.resets.put(r);
@@ -36,9 +37,12 @@ export async function completedResets(limit = 200): Promise<ResetRecord[]> {
 export async function deleteJournalEntry(id: string) {
   await db.journal.delete(id);
   // Unlink it from the reset it belonged to.
-  await db.resets.where("id").above("").modify((r) => {
-    if (r.reflectionId === id) delete r.reflectionId;
-  });
+  await db.resets
+    .where("id")
+    .above("")
+    .modify((r) => {
+      if (r.reflectionId === id) delete r.reflectionId;
+    });
 }
 
 export async function deleteAllData() {

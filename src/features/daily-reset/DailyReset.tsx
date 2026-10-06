@@ -19,7 +19,12 @@ export function DailyReset() {
     void (async () => {
       const history = await completedResets(50);
       if (live) setWeek(thisWeek(history));
-      const req = buildMissionRequest({ emotion: "not_sure", prefs: { ...prefs, canGoOutside: prefs.canGoOutside === "ask_each_time" ? "yes" : prefs.canGoOutside }, history, now: new Date() });
+      const req = buildMissionRequest({
+        emotion: "not_sure",
+        prefs: { ...prefs, canGoOutside: prefs.canGoOutside === "ask_each_time" ? "yes" : prefs.canGoOutside },
+        history,
+        now: new Date(),
+      });
       const m = await meraAI.generateDailyReset(req);
       if (live) setMission(m);
     })();
@@ -41,14 +46,24 @@ export function DailyReset() {
           <Button className="mt-6 w-full" onClick={() => send({ type: "START_MISSION", resetId: newId(), now: Date.now(), mission })} data-testid="daily-go">
             Do it now
           </Button>
-          <p className="mt-3 text-center text-micro text-muted">{mission.source === "library" ? "From MERA’s reset library" : mission.source === "local-gemma" ? "Chosen by Gemma, on this device" : "Chosen by Gemma (Connected AI)"}</p>
+          <p className="mt-3 text-center text-micro text-muted">
+            {mission.source === "library"
+              ? "From MERA’s reset library"
+              : mission.source === "local-gemma"
+                ? "Chosen by Gemma, on this device"
+                : "Chosen by Gemma (Connected AI)"}
+          </p>
         </div>
       ) : (
         <p className="text-body text-ink-2" role="status">
           Finding one for today…
         </p>
       )}
-      {week > 0 && <p className="mt-8 text-body text-ink-2">You made time for yourself {countWord(week)} {week === 1 ? "time" : "times"} this week.</p>}
+      {week > 0 && (
+        <p className="mt-8 text-body text-ink-2">
+          You made time for yourself {countWord(week)} {week === 1 ? "time" : "times"} this week.
+        </p>
+      )}
     </Page>
   );
 }

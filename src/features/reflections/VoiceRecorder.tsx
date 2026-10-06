@@ -19,10 +19,13 @@ export function VoiceRecorder({ onSave, onCancel }: { onSave: (audio: Blob, mime
   const blob = useRef<Blob | null>(null);
   const started = useRef(0);
 
-  useEffect(() => () => {
-    rec.current?.stream.getTracks().forEach((t) => t.stop());
-    if (url) URL.revokeObjectURL(url);
-  }, [url]);
+  useEffect(
+    () => () => {
+      rec.current?.stream.getTracks().forEach((t) => t.stop());
+      if (url) URL.revokeObjectURL(url);
+    },
+    [url],
+  );
 
   useEffect(() => {
     if (state !== "recording") return;
@@ -58,7 +61,11 @@ export function VoiceRecorder({ onSave, onCancel }: { onSave: (audio: Blob, mime
   if (state === "unsupported" || state === "denied") {
     return (
       <div className="w-full text-center">
-        <p className="text-body text-ink-2">{state === "denied" ? "The microphone isn’t available. You can type instead, or skip." : "Voice notes aren’t supported in this browser. You can type instead, or skip."}</p>
+        <p className="text-body text-ink-2">
+          {state === "denied"
+            ? "The microphone isn’t available. You can type instead, or skip."
+            : "Voice notes aren’t supported in this browser. You can type instead, or skip."}
+        </p>
         <Button variant="ghost" className="mt-3" onClick={onCancel}>
           Back
         </Button>

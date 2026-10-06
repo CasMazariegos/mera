@@ -21,7 +21,14 @@ const req: MissionRequest = {
   recentTitles: [],
 };
 
-const good = JSON.stringify({ title: "Find the Movement", durationMinutes: 5, category: "sensory", environment: "outdoor", instruction: "Step outside and notice three things around you that are moving.", secondaryInstruction: "Let your attention stay with each one." });
+const good = JSON.stringify({
+  title: "Find the Movement",
+  durationMinutes: 5,
+  category: "sensory",
+  environment: "outdoor",
+  instruction: "Step outside and notice three things around you that are moving.",
+  secondaryInstruction: "Let your attention stay with each one.",
+});
 
 function scripted(...outputs: string[]): ModelTransport & { calls: CompletionRequest[] } {
   const calls: CompletionRequest[] = [];
@@ -73,7 +80,13 @@ describe("model output validation", () => {
   });
 
   it("indoor-only and night rules are enforced on model output", () => {
-    const outdoor = { title: "Sky", durationMinutes: 4, category: "nature" as const, environment: "outdoor" as const, instruction: "Step outside and look at the sky for a while." };
+    const outdoor = {
+      title: "Sky",
+      durationMinutes: 4,
+      category: "nature" as const,
+      environment: "outdoor" as const,
+      instruction: "Step outside and look at the sky for a while.",
+    };
     expect(unsafeMissionReason(outdoor, { ...req, canGoOutside: "indoor_only" })).toBe("outdoor_for_indoor_only");
     expect(unsafeMissionReason(outdoor, { ...req, timeOfDay: "night" })).toBe("outdoor_at_night");
     expect(unsafeMissionReason({ ...outdoor, instruction: "Look at your phone for five minutes." })).toMatch(/unsafe_phrase/);
@@ -94,7 +107,13 @@ describe("non-clinical text", () => {
     expect(numbersAreGrounded("Outdoor movement helped in 9 of your last 10 resets.", [4, 5])).toBe(false);
   });
   it("reflection falls back to honest template wording (no fake positivity on 'worse')", async () => {
-    const r = await new FallbackResetProvider().summarizeReflection({ emotion: "anxious", missionTitle: "Fresh Air", missionCategory: "sensory", outcome: "worse", minutesAway: 3 });
+    const r = await new FallbackResetProvider().summarizeReflection({
+      emotion: "anxious",
+      missionTitle: "Fresh Air",
+      missionCategory: "sensory",
+      outcome: "worse",
+      minutesAway: 3,
+    });
     expect(r.text).toMatch(/didn't help/);
     expect(unsafeTextReason(r.text)).toBeNull();
   });
@@ -108,7 +127,14 @@ describe("non-clinical text", () => {
       return new Response("{}", { status: 503 });
     }) as typeof fetch;
     try {
-      await ai.summarizeReflection({ emotion: "sad", missionTitle: "Near the Light", missionCategory: "indoor", outcome: "better", minutesAway: 3, note: "a private thought" });
+      await ai.summarizeReflection({
+        emotion: "sad",
+        missionTitle: "Near the Light",
+        missionCategory: "indoor",
+        outcome: "better",
+        minutesAway: 3,
+        note: "a private thought",
+      });
     } finally {
       globalThis.fetch = orig;
     }

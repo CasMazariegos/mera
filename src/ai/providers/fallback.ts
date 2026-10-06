@@ -8,7 +8,14 @@ import { selectMission } from "@/features/missions/select";
 import type { MeraAIProvider, PatternResult, TextResult } from "./types";
 
 export function templateReflection(f: ReflectionFacts): string {
-  const what = f.missionCategory === "nature" ? "Time with something natural" : f.missionCategory === "movement" ? "Moving for a few minutes" : f.missionCategory === "indoor" ? "A small change of scene" : "Noticing your surroundings";
+  const what =
+    f.missionCategory === "nature"
+      ? "Time with something natural"
+      : f.missionCategory === "movement"
+        ? "Moving for a few minutes"
+        : f.missionCategory === "indoor"
+          ? "A small change of scene"
+          : "Noticing your surroundings";
   switch (f.outcome) {
     case "better":
       return `${what} seemed to help this time. I'll keep that in mind for future resets.`;

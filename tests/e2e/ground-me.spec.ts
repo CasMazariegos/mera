@@ -3,7 +3,12 @@ import { expect, test } from "@playwright/test";
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
   // Demo mode (short timers) + library missions, so the run is quick and deterministic.
-  await page.evaluate(() => localStorage.setItem("mera.settings", JSON.stringify({ state: { demo: true, aiMode: "off", canGoOutside: "yes", usualMinutes: 5, sound: false, haptics: false }, version: 1 })));
+  await page.evaluate(() =>
+    localStorage.setItem(
+      "mera.settings",
+      JSON.stringify({ state: { demo: true, aiMode: "off", canGoOutside: "yes", usualMinutes: 5, sound: false, haptics: false }, version: 1 }),
+    ),
+  );
   await page.reload();
 });
 

@@ -16,12 +16,20 @@ const sentence = (max: number) =>
     .refine((s) => !/[<>{}[\]`]|https?:|www\./i.test(s), "plain_text_only");
 
 export const missionSchema = z.object({
-  title: z.string().trim().min(3).max(40).refine((s) => !/[<>{}[\]`]/.test(s), "plain_text_only"),
+  title: z
+    .string()
+    .trim()
+    .min(3)
+    .max(40)
+    .refine((s) => !/[<>{}[\]`]/.test(s), "plain_text_only"),
   durationMinutes: z.number().int().min(2).max(10),
   category: z.enum(CATEGORIES),
   environment: z.enum(ENVIRONMENTS),
   instruction: sentence(140),
-  secondaryInstruction: sentence(120).optional().nullable().transform((v) => v ?? undefined),
+  secondaryInstruction: sentence(120)
+    .optional()
+    .nullable()
+    .transform((v) => v ?? undefined),
 });
 export type MissionOutput = z.infer<typeof missionSchema>;
 

@@ -5,7 +5,15 @@
  * rendered.
  */
 import { missionSchema, patternPhraseSchema, reflectionSummarySchema, type MissionRequest } from "@/ai/schemas/mission";
-import { missionMessages, patternMessages, reflectionMessages, repairMessages, type ChatMessage, type PatternFact, type ReflectionFacts } from "@/ai/prompts/prompts";
+import {
+  missionMessages,
+  patternMessages,
+  reflectionMessages,
+  repairMessages,
+  type ChatMessage,
+  type PatternFact,
+  type ReflectionFacts,
+} from "@/ai/prompts/prompts";
 import { numbersAreGrounded, unsafeMissionReason, unsafeTextReason } from "@/ai/safety/safety";
 import { examplesFor } from "@/features/missions/select";
 import type { GeneratedMission } from "@/types";
@@ -32,7 +40,11 @@ export function extractJsonObject(output: string): string | null {
 
 type Check<T> = (value: T) => string | null;
 
-export function parseWith<S extends z.ZodTypeAny>(schema: S, raw: string, check?: Check<z.infer<S>>): { ok: true; value: z.infer<S> } | { ok: false; problem: string } {
+export function parseWith<S extends z.ZodTypeAny>(
+  schema: S,
+  raw: string,
+  check?: Check<z.infer<S>>,
+): { ok: true; value: z.infer<S> } | { ok: false; problem: string } {
   const json = extractJsonObject(raw);
   if (!json) return { ok: false, problem: "no JSON object" };
   let data: unknown;
@@ -56,7 +68,14 @@ export class GemmaProvider implements MeraAIProvider {
   }
 
   /** Ask, validate, and repair once. Throws ProviderError if both attempts fail. */
-  private async ask<S extends z.ZodTypeAny>(task: TaskName, input: unknown, messages: ChatMessage[], schema: S, maxTokens: number, check?: Check<z.infer<S>>): Promise<z.infer<S>> {
+  private async ask<S extends z.ZodTypeAny>(
+    task: TaskName,
+    input: unknown,
+    messages: ChatMessage[],
+    schema: S,
+    maxTokens: number,
+    check?: Check<z.infer<S>>,
+  ): Promise<z.infer<S>> {
     const first = await this.transport.complete({ task, input, messages, maxTokens });
     const a = parseWith(schema, first, check);
     if (a.ok) return a.value;
@@ -90,7 +109,14 @@ export class GemmaProvider implements MeraAIProvider {
     const out: PatternResult[] = [];
     for (const f of facts) {
       try {
-        const r = await this.ask("pattern", f, patternMessages(f), patternPhraseSchema, 70, (v) => unsafeTextReason(v.sentence, 1) ?? (numbersAreGrounded(v.sentence, f.numbers) ? null : "ungrounded_numbers"));
+        const r = await this.ask(
+          "pattern",
+          f,
+          patternMessages(f),
+          patternPhraseSchema,
+          70,
+          (v) => unsafeTextReason(v.sentence, 1) ?? (numbersAreGrounded(v.sentence, f.numbers) ? null : "ungrounded_numbers"),
+        );
         out.push({ key: f.key, text: r.sentence, source: this.id });
       } catch {
         // This one observation keeps its deterministic wording.

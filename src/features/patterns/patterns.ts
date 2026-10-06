@@ -90,7 +90,9 @@ export function detectPatterns(history: ResetRecord[]): PatternFact[] {
     const outdoorBetter = rate(outdoor) > rate(indoor);
     facts.push({
       key: "outdoor-vs-indoor",
-      sentence: outdoorBetter ? "Going outside seems to have helped more than staying in during your recent resets." : "Indoor resets seem to have worked as well as or better than going outside lately.",
+      sentence: outdoorBetter
+        ? "Going outside seems to have helped more than staying in during your recent resets."
+        : "Indoor resets seem to have worked as well as or better than going outside lately.",
       numbers: [],
     });
   }
@@ -100,7 +102,11 @@ export function detectPatterns(history: ResetRecord[]): PatternFact[] {
   for (const r of history) byTime[timeOfDay(r.hour)]++;
   const [topTime, topCount] = (Object.entries(byTime) as [TimeOfDay, number][]).sort((a, b) => b[1] - a[1])[0]!;
   if (history.length >= 4 && topCount / history.length >= 0.5) {
-    facts.push({ key: `time-${topTime}`, sentence: `You tend to reach for MERA most often in the ${topTime === "night" ? "late hours" : topTime}.`, numbers: [] });
+    facts.push({
+      key: `time-${topTime}`,
+      sentence: `You tend to reach for MERA most often in the ${topTime === "night" ? "late hours" : topTime}.`,
+      numbers: [],
+    });
   }
 
   // 4. Most common starting feeling.

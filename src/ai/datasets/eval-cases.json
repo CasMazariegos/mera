@@ -1,0 +1,452 @@
+[
+  {
+    "id": "overwhelmed-afternoon-outside",
+    "request": {
+      "emotion": "overwhelmed",
+      "canGoOutside": "yes",
+      "minutes": 5,
+      "lowMobility": false,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "afternoon",
+      "helped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "anxious-afternoon-outside",
+    "request": {
+      "emotion": "anxious",
+      "canGoOutside": "yes",
+      "minutes": 5,
+      "lowMobility": false,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "afternoon",
+      "helped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "angry-afternoon-outside",
+    "request": {
+      "emotion": "angry",
+      "canGoOutside": "yes",
+      "minutes": 5,
+      "lowMobility": false,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "afternoon",
+      "helped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "sad-afternoon-outside",
+    "request": {
+      "emotion": "sad",
+      "canGoOutside": "yes",
+      "minutes": 5,
+      "lowMobility": false,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "afternoon",
+      "helped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "overstimulated-afternoon-outside",
+    "request": {
+      "emotion": "overstimulated",
+      "canGoOutside": "yes",
+      "minutes": 5,
+      "lowMobility": false,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "afternoon",
+      "helped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "scattered-afternoon-outside",
+    "request": {
+      "emotion": "scattered",
+      "canGoOutside": "yes",
+      "minutes": 5,
+      "lowMobility": false,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "afternoon",
+      "helped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "drained-afternoon-outside",
+    "request": {
+      "emotion": "drained",
+      "canGoOutside": "yes",
+      "minutes": 5,
+      "lowMobility": false,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "afternoon",
+      "helped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "not_sure-afternoon-outside",
+    "request": {
+      "emotion": "not_sure",
+      "canGoOutside": "yes",
+      "minutes": 5,
+      "lowMobility": false,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "afternoon",
+      "helped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "indoor-only-overwhelmed",
+    "request": {
+      "emotion": "overwhelmed",
+      "canGoOutside": "indoor_only",
+      "minutes": 5,
+      "lowMobility": false,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "afternoon",
+      "helped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "indoor-only-angry",
+    "request": {
+      "emotion": "angry",
+      "canGoOutside": "indoor_only",
+      "minutes": 5,
+      "lowMobility": false,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "afternoon",
+      "helped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "night-anxious",
+    "request": {
+      "emotion": "anxious",
+      "canGoOutside": "yes",
+      "minutes": 5,
+      "lowMobility": false,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "night",
+      "helped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "night-sad-indoor",
+    "request": {
+      "emotion": "sad",
+      "canGoOutside": "indoor_only",
+      "minutes": 5,
+      "lowMobility": false,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "night",
+      "helped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "low-mobility-drained",
+    "request": {
+      "emotion": "drained",
+      "canGoOutside": "yes",
+      "minutes": 5,
+      "lowMobility": true,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "afternoon",
+      "helped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "avoid-sound-scattered",
+    "request": {
+      "emotion": "scattered",
+      "canGoOutside": "yes",
+      "minutes": 5,
+      "lowMobility": false,
+      "avoidSound": true,
+      "avoidSmell": false,
+      "timeOfDay": "afternoon",
+      "helped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "two-minutes-overstimulated",
+    "request": {
+      "emotion": "overstimulated",
+      "canGoOutside": "yes",
+      "minutes": 2,
+      "lowMobility": false,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "afternoon",
+      "helped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "movement-helped",
+    "request": {
+      "emotion": "scattered",
+      "canGoOutside": "yes",
+      "minutes": 5,
+      "lowMobility": false,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "afternoon",
+      "helped": {
+        "nature": 0,
+        "movement": 3,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 2
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "nature-helped-morning",
+    "request": {
+      "emotion": "sad",
+      "canGoOutside": "yes",
+      "minutes": 5,
+      "lowMobility": false,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "morning",
+      "helped": {
+        "nature": 2,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": []
+    }
+  },
+  {
+    "id": "repeat-avoid",
+    "request": {
+      "emotion": "overwhelmed",
+      "canGoOutside": "yes",
+      "minutes": 5,
+      "lowMobility": false,
+      "avoidSound": false,
+      "avoidSmell": false,
+      "timeOfDay": "afternoon",
+      "helped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "notHelped": {
+        "nature": 0,
+        "movement": 0,
+        "sensory": 0,
+        "indoor": 0
+      },
+      "recentTitles": ["Find Three Greens", "A Slow Five"]
+    }
+  }
+]

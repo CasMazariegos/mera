@@ -9,7 +9,11 @@ import { EMOTIONS, EMOTION_LABEL, OUTCOME_LABEL, type Emotion, type JournalEntry
 function BlobMedia({ blob, kind, alt }: { blob: Blob; kind: "audio" | "image"; alt?: string }) {
   const url = useMemo(() => URL.createObjectURL(blob), [blob]);
   useEffect(() => () => URL.revokeObjectURL(url), [url]);
-  return kind === "audio" ? <audio controls src={url} className="mt-3 w-full" /> : <img src={url} alt={alt ?? "Your photo"} className="mt-3 max-h-64 w-full rounded-2xl object-cover" />;
+  return kind === "audio" ? (
+    <audio controls src={url} className="mt-3 w-full" />
+  ) : (
+    <img src={url} alt={alt ?? "Your photo"} className="mt-3 max-h-64 w-full rounded-2xl object-cover" />
+  );
 }
 
 export function JournalPage() {
@@ -26,7 +30,9 @@ export function JournalPage() {
     db.journal.orderBy("createdAt").reverse().toArray().then(setEntries);
   }, []);
 
-  const shown = (entries ?? []).filter((e) => !q.trim() || `${e.text ?? ""} ${e.missionTitle ?? ""} ${e.mood ?? ""}`.toLowerCase().includes(q.trim().toLowerCase()));
+  const shown = (entries ?? []).filter(
+    (e) => !q.trim() || `${e.text ?? ""} ${e.missionTitle ?? ""} ${e.mood ?? ""}`.toLowerCase().includes(q.trim().toLowerCase()),
+  );
 
   async function add() {
     if (!draft.trim()) return;
@@ -44,11 +50,23 @@ export function JournalPage() {
           <label htmlFor="journal-new" className="sr-only">
             New note
           </label>
-          <textarea id="journal-new" rows={4} value={draft} onChange={(e) => setDraft(e.target.value.slice(0, 2000))} placeholder="What did you notice?" className="w-full resize-none rounded-2xl border border-line-strong bg-elevated p-3 text-body text-ink placeholder:text-muted" />
+          <textarea
+            id="journal-new"
+            rows={4}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value.slice(0, 2000))}
+            placeholder="What did you notice?"
+            className="w-full resize-none rounded-2xl border border-line-strong bg-elevated p-3 text-body text-ink placeholder:text-muted"
+          />
           <label htmlFor="journal-mood" className="mt-3 block text-small text-ink-2">
             Mood (optional)
           </label>
-          <select id="journal-mood" value={mood} onChange={(e) => setMood(e.target.value as Emotion | "")} className="mt-1 min-h-12 w-full rounded-2xl border border-line-strong bg-elevated px-3 text-body text-ink">
+          <select
+            id="journal-mood"
+            value={mood}
+            onChange={(e) => setMood(e.target.value as Emotion | "")}
+            className="mt-1 min-h-12 w-full rounded-2xl border border-line-strong bg-elevated px-3 text-body text-ink"
+          >
             <option value="">—</option>
             {EMOTIONS.map((e) => (
               <option key={e} value={e}>
@@ -76,7 +94,14 @@ export function JournalPage() {
           <label htmlFor="journal-search" className="sr-only">
             Search your journal
           </label>
-          <input id="journal-search" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search" className="min-h-12 w-full rounded-full border border-line bg-surface px-5 text-body text-ink placeholder:text-muted" />
+          <input
+            id="journal-search"
+            type="search"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search"
+            className="min-h-12 w-full rounded-full border border-line bg-surface px-5 text-body text-ink placeholder:text-muted"
+          />
         </div>
       )}
 
@@ -119,7 +144,13 @@ export function JournalPage() {
         <h2 id="journal-privacy" className="text-h3 font-semibold text-ink">
           Your notes, your control
         </h2>
-        <Toggle id="ai-analysis" label="Let Gemma read my notes" hint="Used only for the short reflection after a reset. On this device it never leaves; Connected AI needs a separate permission in Privacy & AI." checked={settings.aiReflectionAnalysis} onChange={(v) => settings.set({ aiReflectionAnalysis: v })} />
+        <Toggle
+          id="ai-analysis"
+          label="Let Gemma read my notes"
+          hint="Used only for the short reflection after a reset. On this device it never leaves; Connected AI needs a separate permission in Privacy & AI."
+          checked={settings.aiReflectionAnalysis}
+          onChange={(v) => settings.set({ aiReflectionAnalysis: v })}
+        />
         <div className="mt-2 flex flex-wrap gap-3">
           <Button variant="quiet" onClick={() => void exportAll().then((b) => download(b, `mera-export-${new Date().toISOString().slice(0, 10)}.json`))}>
             Export

@@ -45,7 +45,14 @@ function describe(req: MissionRequest): string {
 }
 
 function exampleJson(m: LibraryMission): string {
-  return JSON.stringify({ title: m.title, durationMinutes: m.durationMinutes, category: m.category, environment: m.environment, instruction: m.instruction, secondaryInstruction: m.secondaryInstruction ?? "" });
+  return JSON.stringify({
+    title: m.title,
+    durationMinutes: m.durationMinutes,
+    category: m.category,
+    environment: m.environment,
+    instruction: m.instruction,
+    secondaryInstruction: m.secondaryInstruction ?? "",
+  });
 }
 
 export function missionMessages(req: MissionRequest, examples: LibraryMission[]): ChatMessage[] {
@@ -98,7 +105,10 @@ export function reflectionMessages(f: ReflectionFacts): ChatMessage[] {
     .filter(Boolean)
     .join("\n");
   return [
-    { role: "user", content: `${REFLECTION_RULES}\n\nStarted: overwhelmed\nMission: Find the Movement (sensory)\nMinutes away from the screen: 5\nAfter: better\nTheir note: """the cold air helped"""` },
+    {
+      role: "user",
+      content: `${REFLECTION_RULES}\n\nStarted: overwhelmed\nMission: Find the Movement (sensory)\nMinutes away from the screen: 5\nAfter: better\nTheir note: """the cold air helped"""`,
+    },
     { role: "assistant", content: `{"summary":"Cool air and a few minutes outside seemed to help this time. I'll keep that in mind for future resets."}` },
     { role: "user", content: facts },
   ];

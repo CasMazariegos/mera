@@ -88,13 +88,17 @@ self.onmessage = async (e: MessageEvent<ToWorker>) => {
     const generate = await load();
     stopper.reset();
     const started = performance.now();
-    const out = (await generate(msg.messages, { max_new_tokens: msg.maxTokens, do_sample: false, stopping_criteria: stopper })) as unknown as Array<{ generated_text: Array<{ content: string }> }>;
+    const out = (await generate(msg.messages, { max_new_tokens: msg.maxTokens, do_sample: false, stopping_criteria: stopper })) as unknown as Array<{
+      generated_text: Array<{ content: string }>;
+    }>;
     if (stopper.interrupted) return post({ type: "cancelled", id: msg.id });
     post({ type: "result", id: msg.id, output: out[0]?.generated_text.at(-1)?.content ?? "", ms: Math.round(performance.now() - started) });
   } catch (err) {
     console.error("[mera-model]", err);
     const file = err instanceof DownloadError ? err.file : undefined;
-    const downloadedBytes = file ? [...fileBytes.entries()].reduce((n, [f, v]) => n + (f === file ? (err as DownloadError).downloadedBytes : v.loaded), 0) : undefined;
+    const downloadedBytes = file
+      ? [...fileBytes.entries()].reduce((n, [f, v]) => n + (f === file ? (err as DownloadError).downloadedBytes : v.loaded), 0)
+      : undefined;
     post({ type: "error", id: msg.type === "complete" ? msg.id : undefined, reason: reasonOf(err), detail: detailOf(err), file, downloadedBytes });
   }
 };

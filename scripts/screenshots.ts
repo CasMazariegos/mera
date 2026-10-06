@@ -23,7 +23,10 @@ for (const scheme of ["light", "dark"] as const) {
   const page = await ctx.newPage();
   await page.goto(base);
   await page.evaluate(() => {
-    localStorage.setItem("mera.settings", JSON.stringify({ state: { demo: true, aiMode: "off", canGoOutside: "ask_each_time", usualMinutes: 5, sound: false, haptics: false }, version: 1 }));
+    localStorage.setItem(
+      "mera.settings",
+      JSON.stringify({ state: { demo: true, aiMode: "off", canGoOutside: "ask_each_time", usualMinutes: 5, sound: false, haptics: false }, version: 1 }),
+    );
   });
   await page.reload();
   await shot(page, `${scheme}-01-home`);
@@ -36,7 +39,11 @@ for (const scheme of ["light", "dark"] as const) {
   await shot(page, `${scheme}-04-breathing`);
   await page.getByRole("button", { name: "Skip breathing" }).click();
   await shot(page, `${scheme}-05-sense5`);
-  for (let i = 0; i < 5; i++) await page.getByTestId("sense-done").click({ timeout: 5000 }).catch(() => {});
+  for (let i = 0; i < 5; i++)
+    await page
+      .getByTestId("sense-done")
+      .click({ timeout: 5000 })
+      .catch(() => {});
   await shot(page, `${scheme}-06-emotion`);
   await page.getByTestId("emotion-overwhelmed").click();
   await page.getByTestId("outside-yes").click();

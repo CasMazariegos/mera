@@ -177,7 +177,9 @@ export function EmotionScene() {
         ))}
       </div>
       <p className="mt-5 text-small text-muted">
-        {settings.aiMode === "remote" ? "No need to explain. Only this choice and your reset preferences are shared with Connected AI to pick your reset." : "No need to explain. This stays on your device."}
+        {settings.aiMode === "remote"
+          ? "No need to explain. Only this choice and your reset preferences are shared with Connected AI to pick your reset."
+          : "No need to explain. This stays on your device."}
       </p>
     </Scene>
   );

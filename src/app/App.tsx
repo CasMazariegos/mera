@@ -33,7 +33,10 @@ function SubPage({ children }: { children: React.ReactNode }) {
     <>
       <header className="mx-auto flex w-full max-w-xl items-center justify-between px-6 pt-[max(1rem,env(safe-area-inset-top))]">
         <a href={href("/")} className="inline-flex min-h-11 items-center rounded-full pr-3 text-small font-medium text-ink-2 hover:text-ink">
-          <span aria-hidden className="mr-1.5">←</span> Home
+          <span aria-hidden className="mr-1.5">
+            ←
+          </span>{" "}
+          Home
         </a>
         <span className="font-display text-small font-semibold tracking-[0.24em] text-ink-2" aria-hidden>
           MERA
@@ -87,7 +90,10 @@ export function App() {
         Skip to content
       </a>
       {demo && !inFlow && (
-        <p className="mx-auto mt-[max(0.5rem,env(safe-area-inset-top))] w-fit rounded-full bg-sunrise-soft px-3 py-1 text-micro font-semibold tracking-[0.12em] text-ink uppercase" data-testid="demo-badge">
+        <p
+          className="mx-auto mt-[max(0.5rem,env(safe-area-inset-top))] w-fit rounded-full bg-sunrise-soft px-3 py-1 text-micro font-semibold tracking-[0.12em] text-ink uppercase"
+          data-testid="demo-badge"
+        >
           Demo mode · short timers
         </p>
       )}

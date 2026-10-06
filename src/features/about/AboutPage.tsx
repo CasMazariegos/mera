@@ -25,16 +25,26 @@ export function AboutPage() {
         <p className="font-display text-h3">MERA uses AI to shorten the digital experience, not extend it.</p>
       </Block>
       <Block title="Why Gemma">
-        <p>Gemma is MERA’s open-weight intelligence layer. It picks one real-world mission from how you feel and what has helped before, and writes a sentence or two after a reset — always validated, always optional, with a built-in library when it’s unavailable.</p>
+        <p>
+          Gemma is MERA’s open-weight intelligence layer. It picks one real-world mission from how you feel and what has helped before, and writes a sentence or
+          two after a reset — always validated, always optional, with a built-in library when it’s unavailable.
+        </p>
       </Block>
       <Block title="Why Render">
         <p>Render hosts MERA’s production app and its small server: the installable web app, a health check, and the optional Connected AI endpoint.</p>
       </Block>
       <Block title="Why open matters">
-        <p>Some of the most personal things people write should not require sending those thoughts to a remote proprietary AI provider. Open weights let Gemma run right here in your browser, offline, with your notes never leaving the device — and let anyone inspect, swap or tune the model.</p>
+        <p>
+          Some of the most personal things people write should not require sending those thoughts to a remote proprietary AI provider. Open weights let Gemma
+          run right here in your browser, offline, with your notes staying on the device (Connected AI is a separate, opt-in choice) — and let anyone inspect,
+          swap or tune the model.
+        </p>
       </Block>
       <Block title="What MERA is not">
-        <p>MERA is a grounding and wellness tool. It isn’t therapy, a diagnosis, a treatment, or a crisis service, and it doesn’t replace professional care. If you’re in danger or thinking about harming yourself, contact local emergency services or a crisis line where you live.</p>
+        <p>
+          MERA is a grounding and wellness tool. It isn’t therapy, a diagnosis, a treatment, or a crisis service, and it doesn’t replace professional care. If
+          you’re in danger or thinking about harming yourself, contact local emergency services or a crisis line where you live.
+        </p>
       </Block>
     </Page>
   );

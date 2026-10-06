@@ -31,7 +31,19 @@ describe("patterns (deterministic, non-clinical)", () => {
   });
 
   it("counts what helped, with numbers it can stand behind", () => {
-    const h = [reset({}), reset({}), reset({ outcome: "same" }), reset({ mission: { title: "Open a Window", durationMinutes: 3, category: "indoor", environment: "indoor", instruction: "Open a window.", source: "library" }, outcome: "same" }), reset({ mission: { title: "Open a Window", durationMinutes: 3, category: "indoor", environment: "indoor", instruction: "Open a window.", source: "library" }, outcome: "worse" })];
+    const h = [
+      reset({}),
+      reset({}),
+      reset({ outcome: "same" }),
+      reset({
+        mission: { title: "Open a Window", durationMinutes: 3, category: "indoor", environment: "indoor", instruction: "Open a window.", source: "library" },
+        outcome: "same",
+      }),
+      reset({
+        mission: { title: "Open a Window", durationMinutes: 3, category: "indoor", environment: "indoor", instruction: "Open a window.", source: "library" },
+        outcome: "worse",
+      }),
+    ];
     const facts = detectPatterns(h);
     const best = facts.find((f) => f.key === "best-movement")!;
     expect(best.sentence).toBe("Movement resets have helped in 2 of your last 3 tries.");
@@ -42,7 +54,12 @@ describe("patterns (deterministic, non-clinical)", () => {
   });
 
   it("mission requests carry counts and preferences — never free text or location", () => {
-    const req = buildMissionRequest({ emotion: "angry", prefs: DEFAULT_PREFERENCES, history: [reset({}), reset({ outcome: "worse" })], now: new Date(2026, 9, 6, 22) });
+    const req = buildMissionRequest({
+      emotion: "angry",
+      prefs: DEFAULT_PREFERENCES,
+      history: [reset({}), reset({ outcome: "worse" })],
+      now: new Date(2026, 9, 6, 22),
+    });
     expect(req).toMatchObject({ timeOfDay: "night", helped: { movement: 1 }, notHelped: { movement: 1 }, recentTitles: ["A Slow Five", "A Slow Five"] });
     expect(JSON.stringify(req)).not.toMatch(/note|journal|lat|lng/i);
     expect(timeOfDay(7)).toBe("morning");

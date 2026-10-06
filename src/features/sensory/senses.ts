@@ -36,7 +36,9 @@ export const SENSES: SenseScreen[] = [
 /** Gentler wording when the person has said sound or smell isn't useful for them. */
 export function senseFor(step: SenseScreen["step"], opts: { avoidSound: boolean; avoidSmell: boolean }): SenseScreen {
   const s = SENSES.find((x) => x.step === step)!;
-  if (s.sense === "hear" && opts.avoidSound) return { ...s, lead: "Look again.", prompt: "Notice three things that are moving, even slightly.", cta: "I notice them" };
-  if (s.sense === "smell" && opts.avoidSmell) return { ...s, prompt: "Notice two temperatures — warm or cool spots on your skin.", support: "Hands, face, feet. Anything counts.", cta: "Done" };
+  if (s.sense === "hear" && opts.avoidSound)
+    return { ...s, lead: "Look again.", prompt: "Notice three things that are moving, even slightly.", cta: "I notice them" };
+  if (s.sense === "smell" && opts.avoidSmell)
+    return { ...s, prompt: "Notice two temperatures — warm or cool spots on your skin.", support: "Hands, face, feet. Anything counts.", cta: "Done" };
   return s;
 }

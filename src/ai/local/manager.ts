@@ -205,7 +205,11 @@ function subscribe(l: () => void) {
 
 const serverSnapshot: LocalStatus = { kind: "checking" };
 export function useLocalModel(): LocalStatus {
-  return useSyncExternalStore(subscribe, () => status, () => serverSnapshot);
+  return useSyncExternalStore(
+    subscribe,
+    () => status,
+    () => serverSnapshot,
+  );
 }
 
 /** Start device checks without rendering anything (e.g. at app start). */

@@ -38,14 +38,26 @@ const CLINICAL = [
   /!{2,}|\b(you('ve)? got this|everything will be (okay|ok|fine)|your feelings are valid|let'?s unpack|how can i (help|assist) you)\b/i,
 ];
 
-export function unsafeMissionReason(m: Mission, req?: Pick<MissionRequest, "canGoOutside" | "timeOfDay" | "lowMobility" | "avoidSound" | "avoidSmell">): string | null {
+export function unsafeMissionReason(
+  m: Mission,
+  req?: Pick<MissionRequest, "canGoOutside" | "timeOfDay" | "lowMobility" | "avoidSound" | "avoidSmell">,
+): string | null {
   const text = `${m.title} ${m.instruction} ${m.secondaryInstruction ?? ""}`;
   for (const re of UNSAFE_MISSION) if (re.test(text)) return `unsafe_phrase:${re.source.slice(0, 24)}`;
   for (const re of CLINICAL) if (re.test(text)) return "clinical_language";
   // More than two sentences per field isn't "one simple instruction".
   if ((m.instruction.match(/[.!?](\s|$)/g) ?? []).length > 2) return "too_long";
-  if (req?.canGoOutside === "indoor_only" && (m.environment === "outdoor" || /\b(outside|outdoors|step out|go out|walk around the block|yard|garden|park)\b/i.test(text))) return "outdoor_for_indoor_only";
-  if (req?.timeOfDay === "night" && m.environment === "outdoor" && !/\b(doorway|porch|balcony|window|step outside your door|just outside your door)\b/i.test(text)) return "outdoor_at_night";
+  if (
+    req?.canGoOutside === "indoor_only" &&
+    (m.environment === "outdoor" || /\b(outside|outdoors|step out|go out|walk around the block|yard|garden|park)\b/i.test(text))
+  )
+    return "outdoor_for_indoor_only";
+  if (
+    req?.timeOfDay === "night" &&
+    m.environment === "outdoor" &&
+    !/\b(doorway|porch|balcony|window|step outside your door|just outside your door)\b/i.test(text)
+  )
+    return "outdoor_at_night";
   if (req?.lowMobility && (m.category === "movement" || /\b(walk|stretch|stand up|stairs)\b/i.test(text))) return "movement_for_low_mobility";
   if (req?.avoidSound && /\b(listen|sounds?|hear)\b/i.test(text)) return "sound_avoided";
   if (req?.avoidSmell && /\b(smell|scent|sniff)\b/i.test(text)) return "smell_avoided";
@@ -68,7 +80,9 @@ export function unsafeTextReason(text: string, maxSentences = 3): string | null 
 /** Numbers in a model-phrased pattern must be numbers we actually computed. */
 export function numbersAreGrounded(text: string, facts: number[]): boolean {
   const words: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
-  const found = [...text.toLowerCase().matchAll(/\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\b/g)].map((m) => (m[1]! in words ? words[m[1]!]! : Number(m[1])));
+  const found = [...text.toLowerCase().matchAll(/\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\b/g)].map((m) =>
+    m[1]! in words ? words[m[1]!]! : Number(m[1]),
+  );
   return found.every((n) => facts.includes(n));
 }
 

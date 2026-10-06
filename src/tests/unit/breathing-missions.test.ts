@@ -53,7 +53,9 @@ describe("deterministic reset library", () => {
   });
   it("covers every category and has night-safe, indoor and low-mobility options", () => {
     expect(new Set(LIBRARY.map((m) => m.category))).toEqual(new Set(["nature", "movement", "sensory", "indoor"]));
-    expect(LIBRARY.filter((m) => eligible(m, { ...base, timeOfDay: "night", canGoOutside: "indoor_only", lowMobility: true, minutes: 2 })).length).toBeGreaterThan(0);
+    expect(
+      LIBRARY.filter((m) => eligible(m, { ...base, timeOfDay: "night", canGoOutside: "indoor_only", lowMobility: true, minutes: 2 })).length,
+    ).toBeGreaterThan(0);
   });
   it("never sends indoor-only people outside, or anyone outside at night", () => {
     for (const r of [rankLibrary({ ...base, canGoOutside: "indoor_only" }), rankLibrary({ ...base, timeOfDay: "night" })]) {

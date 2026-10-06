@@ -29,7 +29,12 @@ export function CheckIn() {
     if (!emotion) return;
     setBusy(true);
     const history = await completedResets(50);
-    const req = buildMissionRequest({ emotion, prefs: { ...prefs, usualMinutes: 2, canGoOutside: prefs.canGoOutside === "ask_each_time" ? "indoor_only" : prefs.canGoOutside }, history, now: new Date() });
+    const req = buildMissionRequest({
+      emotion,
+      prefs: { ...prefs, usualMinutes: 2, canGoOutside: prefs.canGoOutside === "ask_each_time" ? "indoor_only" : prefs.canGoOutside },
+      history,
+      now: new Date(),
+    });
     const mission = await meraAI.generateResetMission(req);
     setBusy(false);
     send({ type: "START_MISSION", resetId: newId(), now: Date.now(), mission, emotion });
@@ -70,7 +75,17 @@ export function CheckIn() {
         <label htmlFor="level" className="text-body font-medium text-ink">
           How heavy does it feel?
         </label>
-        <input id="level" type="range" min={1} max={5} step={1} value={level} onChange={(e) => setLevel(Number(e.target.value))} aria-valuetext={LEVELS[level - 1]} className="mt-4 w-full accent-[var(--accent)]" />
+        <input
+          id="level"
+          type="range"
+          min={1}
+          max={5}
+          step={1}
+          value={level}
+          onChange={(e) => setLevel(Number(e.target.value))}
+          aria-valuetext={LEVELS[level - 1]}
+          className="mt-4 w-full accent-[var(--accent)]"
+        />
         <p className="mt-1 text-small text-ink-2" aria-hidden>
           {LEVELS[level - 1]}
         </p>
