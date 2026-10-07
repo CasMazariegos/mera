@@ -68,8 +68,11 @@ export function gemmaConfigFromEnv(env: ServerEnv, ai?: AiBinding | null): Gemma
   const endpoint = (env.MODEL_ENDPOINT ?? "").replace(/\/+$/, "");
   const model = env.MODEL_NAME ?? "";
   const provider = env.MODEL_PROVIDER === "workers-ai" ? "workers-ai" : "openai";
-  const configured = provider === "workers-ai" ? !!ai && model.startsWith("@cf/") : !!endpoint && !!model;
-  return { enabled: env.ENABLE_REMOTE_AI === "true" && configured, provider, endpoint, apiKey: env.MODEL_API_KEY ?? "", model };
+  const apiKey = env.MODEL_API_KEY ?? "";
+  // A hosted endpoint (e.g. Google AI Studio) needs a key; only a local one (Ollama) may run without.
+  const local = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:|\/|$)/.test(endpoint);
+  const configured = provider === "workers-ai" ? !!ai && model.startsWith("@cf/") : !!endpoint && !!model && (!!apiKey || local);
+  return { enabled: env.ENABLE_REMOTE_AI === "true" && configured, provider, endpoint, apiKey, model };
 }
 
 /** Text from an OpenAI-style chat completion, or Workers AI's `{ response }` shape. */

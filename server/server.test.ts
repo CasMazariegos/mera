@@ -34,6 +34,17 @@ describe("MERA server", () => {
     expect(res.status).toBe(503);
   });
 
+  it("a hosted endpoint without a key stays off (no advertising Connected AI before the key is added)", async () => {
+    const google = { ENABLE_REMOTE_AI: "true", MODEL_ENDPOINT: "https://generativelanguage.googleapis.com/v1beta/openai", MODEL_NAME: "gemma-3-27b-it" };
+    expect(await (await createApp(google).request("/api/config")).json()).toMatchObject({ remoteAI: false });
+    expect(await (await createApp({ ...google, MODEL_API_KEY: "k" }).request("/api/config")).json()).toMatchObject({
+      remoteAI: true,
+      remoteModel: "gemma-3-27b-it",
+    });
+    const ollama = { ENABLE_REMOTE_AI: "true", MODEL_ENDPOINT: "http://localhost:11434/v1", MODEL_NAME: "gemma3:4b" };
+    expect(await (await createApp(ollama).request("/api/config")).json()).toMatchObject({ remoteAI: true });
+  });
+
   it("builds MERA's own prompt from structured input and forwards to an OpenAI-compatible Gemma", async () => {
     const seen: Array<{ url: string; body: { model: string; messages: Array<{ content: string }> } }> = [];
     const fakeFetch = (async (url: string, init?: RequestInit) => {
@@ -58,7 +69,7 @@ describe("MERA server", () => {
 
   it("rejects free-form prompts — it is not a general chatbot", async () => {
     const app = createApp(
-      { ENABLE_REMOTE_AI: "true", MODEL_ENDPOINT: "https://g", MODEL_NAME: "gemma" },
+      { ENABLE_REMOTE_AI: "true", MODEL_ENDPOINT: "https://g", MODEL_NAME: "gemma", MODEL_API_KEY: "k" },
       (async () => new Response("{}")) as unknown as typeof fetch,
     );
     const bad = await app.request("/api/gemma", {

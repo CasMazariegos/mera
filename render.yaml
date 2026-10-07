@@ -17,17 +17,20 @@ services:
       # Local Gemma runs in each visitor's browser; nothing to configure server-side.
       - key: ENABLE_LOCAL_AI
         value: "true"
-      # Connected AI (opt-in for visitors) — off until you set an endpoint.
+      # Connected AI (opt-in for visitors): Gemma on Google AI Studio's OpenAI-compatible endpoint.
+      # Stays off until MODEL_API_KEY is set (the server won't advertise it without a key).
       - key: ENABLE_REMOTE_AI
-        value: "false"
+        value: "true"
       - key: MODEL_MODE
         value: local-first
-      # OpenAI-compatible Gemma endpoint, e.g. https://generativelanguage.googleapis.com/v1beta/openai
+      - key: MODEL_PROVIDER
+        value: openai
       - key: MODEL_ENDPOINT
-        sync: false
-      # e.g. gemma-3-27b-it
+        value: https://generativelanguage.googleapis.com/v1beta/openai
       - key: MODEL_NAME
-        sync: false
-      # Secret — set in the Render dashboard, never committed.
+        value: gemma-3-27b-it
+      # Secret: a free Google AI Studio key (aistudio.google.com/apikey). Set it in the Render dashboard; never commit it.
       - key: MODEL_API_KEY
         sync: false
+      - key: REMOTE_AI_RATE_LIMIT
+        value: "40"
