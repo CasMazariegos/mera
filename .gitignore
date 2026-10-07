@@ -30,3 +30,4 @@ dist-ssr
 dev-dist
 test-results
 playwright-report
+.wrangler
