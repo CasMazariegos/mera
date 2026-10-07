@@ -101,6 +101,30 @@ export function AboutPage() {
         </ol>
       </Block>
 
+      <Block title="AI where it helps, plain code where it must">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-[var(--radius-soft)] bg-accent-soft/40 p-4">
+            <p className="text-small font-semibold text-ink">Gemma</p>
+            <ul className="mt-1.5 space-y-1 text-small text-ink-2">
+              <li>Personalizes the reset mission from your own history</li>
+              <li>Personalizes the Daily reset the same way</li>
+              <li>Writes the short reflection after a reset</li>
+              <li>Rephrases observations in My Patterns</li>
+            </ul>
+          </div>
+          <div className="rounded-[var(--radius-soft)] bg-surface-sunk/70 p-4">
+            <p className="text-small font-semibold text-ink">Deterministic code</p>
+            <ul className="mt-1.5 space-y-1 text-small text-ink-2">
+              <li>The grounding sequence, breathing and 5-4-3-2-1</li>
+              <li>The phone-down timer and time back in the world</li>
+              <li>Safety rules and every check on Gemma’s answers</li>
+              <li>The offline mission library and its fallback choice</li>
+              <li>Counting the patterns (Gemma never invents a number)</li>
+            </ul>
+          </div>
+        </div>
+      </Block>
+
       <Block title="See what Gemma receives">
         <p className="text-small text-ink-2">
           This runs the real mission request from your history on this device. You see the structured input and the checked output, never hidden model text.

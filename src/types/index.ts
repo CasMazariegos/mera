@@ -73,6 +73,10 @@ export interface ResetRecord {
   phoneDownSeconds: number;
   /** Planned phone-down length in seconds. */
   plannedSeconds?: number;
+  /** Phone-down timestamps (ms): when it started, when the timer was due, when the person came back. */
+  phoneDownStartedAt?: number;
+  expectedEndAt?: number;
+  actualEndAt?: number;
   /** True if the timer ran its course, false if ended early. */
   timerCompleted?: boolean;
   /** Quick ("I'm ready to step away") or full grounding. */

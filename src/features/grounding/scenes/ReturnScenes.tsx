@@ -1,15 +1,14 @@
 /** Scenes 9–12: welcome back, optional reflection, a short honest insight, release. */
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
-import { Camera, Download, Mic, PenLine, Sprout, type LucideIcon } from "lucide-react";
+import { Camera, Download, Mic, PenLine } from "lucide-react";
 import { MeraCharacter } from "@/components/MeraCharacter";
-import { EMOTION_ICON, EMOTION_TINT, OUTCOME_ICON, Sparkles } from "@/components/icons";
+import { OUTCOME_ICON } from "@/components/icons";
 import { Button } from "@/components/ui";
 import { useFlow } from "@/store/flow";
 import { useSettings } from "@/store/settings";
 import { meraAI } from "@/ai";
-import { completedResets, db, newId, saveReset } from "@/data/db";
-import { detectPatterns } from "@/features/patterns/patterns";
+import { db, newId, saveReset } from "@/data/db";
 import { takeBeforePhoto } from "@/store/photos";
 import { VoiceRecorder } from "@/features/reflections/VoiceRecorder";
 import { EMOTION_LABEL, OUTCOME_LABEL, type JournalEntry, type Outcome } from "@/types";
@@ -95,8 +94,12 @@ export function ReflectionScene() {
       photoMime: (after ?? before)?.type,
       ...partial,
     };
-    await db.journal.put(entry);
-    send({ type: "REFLECTION_SAVED", reflectionId: entry.id });
+    // If storage fails (private mode, full disk), the reset still finishes; the note just isn't kept.
+    const ok = await db.journal.put(entry).then(
+      () => true,
+      () => false,
+    );
+    send({ type: "REFLECTION_SAVED", reflectionId: ok ? entry.id : null });
   }
 
   function skip() {
@@ -108,7 +111,7 @@ export function ReflectionScene() {
   /** Save this reset as it was ("worse" is useful history), then go straight to a different mission. */
   async function tryAnother() {
     takeBeforePhoto();
-    await saveReset(resetRecordFrom(flow, { demo }));
+    await saveReset(resetRecordFrom(flow, { demo })).catch(() => {});
     send({ type: "TRY_ANOTHER", resetId: newId(), now: Date.now() });
   }
 
@@ -253,7 +256,12 @@ export function AiReflectionScene() {
     if (ran.current) return;
     ran.current = true;
     void (async () => {
-      const note = flow.reflectionId ? (await db.journal.get(flow.reflectionId))?.text : undefined;
+      const note = flow.reflectionId
+        ? await db.journal.get(flow.reflectionId).then(
+            (e) => e?.text,
+            () => undefined,
+          )
+        : undefined;
       const minutesAway = Math.round(flow.phoneDownSeconds / 60);
       const summary = await meraAI.summarizeReflection({
         emotion: flow.emotion ? EMOTION_LABEL[flow.emotion].toLowerCase() : null,
@@ -263,7 +271,7 @@ export function AiReflectionScene() {
         minutesAway,
         note: note || undefined,
       });
-      await saveReset(resetRecordFrom(flow, { insight: summary.text, demo }));
+      await saveReset(resetRecordFrom(flow, { insight: summary.text, demo })).catch(() => {});
       send({ type: "INSIGHT_READY", insight: summary.text });
     })();
   }, [flow, send, demo]);
@@ -283,19 +291,9 @@ export function AiReflectionScene() {
 export function CompleteScene() {
   const flow = useFlow((s) => s.flow);
   const send = useFlow((s) => s.send);
-  const [pattern, setPattern] = useState<string | null>(null);
-
-  useEffect(() => {
-    void completedResets(50).then(async (h) => {
-      const facts = detectPatterns(h).filter((f) => f.key.startsWith("best-") || f.key === "outdoor-vs-indoor");
-      if (!facts.length) return;
-      const [p] = await meraAI.analyzePatterns(facts.slice(0, 1));
-      setPattern(p?.text ?? null);
-    });
-  }, []);
-
   const away = timeAway(flow.phoneDownSeconds);
   const [saved, setSaved] = useState(false);
+  // Completion should feel complete: one number, one line, one sentence, then out.
   return (
     <Scene
       labelledBy="complete-title"
@@ -306,68 +304,40 @@ export function CompleteScene() {
       }
     >
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}>
-        <MeraCharacter state="resting" size={72} />
+        <MeraCharacter state="resting" size={64} still />
       </motion.div>
-      {/* The one number MERA cares about. */}
-      <h1 id="complete-title" tabIndex={-1} className="mt-4 outline-none" data-testid="back-in-world">
+      <p className="mt-5 text-micro font-semibold tracking-[0.16em] text-ink-2 uppercase">Reset complete</p>
+      <h1 id="complete-title" tabIndex={-1} className="mt-3 outline-none" data-testid="back-in-world">
         <span className="block font-display text-[5.5rem] leading-none font-light text-accent-strong tabular">{away.value}</span>
         <span className="mt-2 block font-display text-h2 font-normal text-ink italic">{away.unit} back in the world.</span>
       </h1>
-      <dl className="mt-7 grid w-full grid-cols-2 gap-2.5 text-center" data-testid="recap">
-        <Stat
-          label="You started"
-          value={flow.emotion ? EMOTION_LABEL[flow.emotion] : "—"}
-          icon={flow.emotion ? EMOTION_ICON[flow.emotion] : Sparkles}
-          tint={flow.emotion ? EMOTION_TINT[flow.emotion] : "var(--surface-sunk)"}
-        />
-        <Stat
-          label="Afterwards"
-          value={flow.outcome ? OUTCOME_LABEL[flow.outcome] : "—"}
-          icon={flow.outcome ? OUTCOME_ICON[flow.outcome] : Sprout}
-          tint="var(--accent-soft)"
-        />
-      </dl>
-      {(flow.insight || pattern) && (
-        <div className="glass mt-3 w-full rounded-[var(--radius-soft)] p-5 text-left shadow-gentle">
-          {flow.insight && (
-            <p className="text-body text-ink" data-testid="insight">
-              {flow.insight}
-            </p>
-          )}
-          {pattern && (
-            <p className={`flex items-start gap-2 text-small text-ink-2 ${flow.insight ? "mt-3 border-t border-line/70 pt-3" : ""}`}>
-              <Sprout aria-hidden className="mt-0.5 size-4 shrink-0 text-accent-strong" strokeWidth={2} />
-              {pattern}
-            </p>
-          )}
-        </div>
+      {(flow.emotion || flow.outcome) && (
+        <p className="mt-6 text-small text-ink-2" data-testid="recap">
+          {flow.emotion ? EMOTION_LABEL[flow.emotion] : "Started"}
+          <span aria-hidden> → </span>
+          <span className="sr-only"> before, and afterwards </span>
+          <span className="font-semibold text-ink">{flow.outcome ? OUTCOME_LABEL[flow.outcome] : "—"}</span>
+        </p>
       )}
-      <p className="mt-8 font-display text-h1 font-normal text-ink italic">Go live your life.</p>
+      {flow.insight && (
+        <p className="mt-6 max-w-sm text-body text-balance text-ink" data-testid="insight">
+          {flow.insight}
+        </p>
+      )}
+      <p className="mt-10 font-display text-h1 font-normal text-ink italic">Go live your life.</p>
       {flow.mission && flow.phoneDownSeconds > 0 && (
         <button
           type="button"
           onClick={() =>
             void downloadSummaryCard({ missionTitle: flow.mission!.title, seconds: flow.phoneDownSeconds, date: new Date() }).then(() => setSaved(true))
           }
-          className="mt-4 inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-small text-ink-2 underline underline-offset-4 hover:text-ink"
+          className="mt-3 inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-micro text-muted underline underline-offset-4 hover:text-ink"
           data-testid="save-card"
         >
-          <Download aria-hidden className="size-4" />
-          {saved ? "Saved to this device" : "Save a summary image (no notes included)"}
+          <Download aria-hidden className="size-3.5" />
+          {saved ? "Saved to this device" : "Save a summary image (no notes)"}
         </button>
       )}
     </Scene>
-  );
-}
-
-function Stat({ label, value, icon: Icon, tint }: { label: string; value: string; icon: LucideIcon; tint: string }) {
-  return (
-    <div className="flex flex-col items-center gap-2 rounded-[var(--radius-soft)] border border-line/70 bg-surface/85 px-2 py-4 shadow-gentle">
-      <span aria-hidden className="inline-flex size-9 items-center justify-center rounded-full" style={{ background: tint }}>
-        <Icon className="size-4" strokeWidth={2} />
-      </span>
-      <dt className="text-micro text-ink-2">{label}</dt>
-      <dd className="text-small leading-tight font-semibold text-ink">{value}</dd>
-    </div>
   );
 }

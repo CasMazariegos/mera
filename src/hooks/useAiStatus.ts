@@ -24,8 +24,11 @@ export function useAiStatus(): AiStatus {
   const mode = useSettings((s) => s.aiMode);
   const local = useLocalModel();
   const online = useOnline();
-  if (mode === "local" && (local.kind === "ready" || local.kind === "busy")) return { label: "LOCAL AI", detail: "Gemma is running on this device." };
-  if (mode === "remote" && online) return { label: "CONNECTED AI", detail: "Gemma via MERA’s server (opt-in)." };
-  if (mode === "local" && local.kind === "loading") return { label: "OFFLINE RESET", detail: "Gemma is getting ready; resets use MERA’s library meanwhile." };
-  return { label: "OFFLINE RESET", detail: "Resets come from MERA’s built-in library. Works without internet." };
+  if (mode === "local" && (local.kind === "ready" || local.kind === "busy"))
+    return { label: "LOCAL AI", detail: "Local Gemma: mission personalization runs on this device." };
+  if (mode === "remote" && online)
+    return { label: "CONNECTED AI", detail: "Connected Gemma: mission personalization uses MERA’s configured AI service (opt-in)." };
+  if (mode === "local" && local.kind === "loading")
+    return { label: "OFFLINE RESET", detail: "Local Gemma is getting ready. Until then, MERA uses its built-in grounding mission library." };
+  return { label: "OFFLINE RESET", detail: "Offline reset: MERA is using its built-in grounding mission library. Works without internet." };
 }

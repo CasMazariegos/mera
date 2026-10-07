@@ -33,6 +33,24 @@ CHAOS → "I'm here." → ground → breathe → "I'm ready to step away"
       → optional note → one short insight → "6 minutes back in the world." → "Go live your life."
 ```
 
+## Ground Me flow
+
+| # | Step | What happens |
+| --- | --- | --- |
+| 1 | I'm here | _"I'm here." / "You don't have to figure everything out right now."_ Start reset, or _I need something quieter_ (no sound, haptics or motion). |
+| 2 | Body | _"Put both feet on the ground."_ Moves on by itself. |
+| 3 | Breathe | In 4 · hold 2 · out 6. After one breath: **I'm ready to step away** or **Keep grounding**. |
+| 4 | Senses (full path) | 5-4-3-2-1, one sense per screen, no typing. _I'm ready to step away_ stays available. |
+| 5 | Feeling | _"What feels closest right now?"_ One tap. |
+| 6 | Mission | One personalized real-world mission, 2–10 minutes. **Why this reset?** is there if you want it. |
+| 7 | Hand-off | _"Good." → "Now put me away." → "Go touch grass. I'll be here when you get back."_ |
+| 8 | Phone down | `04:58`, a tiny resting MERA, _Audio · Haptics · End early_. Nothing else. |
+| 9 | Return | _"Welcome back."_ Better / About the same / Worse. After _Worse_: _"Thanks for checking back in."_, then **Try a different reset** or **Finish for now**. |
+| 10 | Note | Optional: Voice, Type or Skip. |
+| 11 | Complete | **Reset complete · 6 minutes back in the world**, one short insight, _"Go live your life."_ Done. |
+
+Quick path: about 30–60 s to the mission (one breath). Full path: about 2–3 minutes.
+
 ## Why it exists
 
 Most wellness apps still ask you to stare at your phone: feeds, streaks, long chats, content libraries. When you're overwhelmed, more screen is the last thing you need. MERA does the opposite: the outside world is supposed to win, and MERA's best outcome is that you close it.
@@ -47,6 +65,8 @@ Most apps measure success by how long you stay. **MERA measures how quickly it c
 - **The one number MERA shows is time away.** _"6 minutes back in the world."_ Not XP, points, streaks or badges. No comparisons, no shaming.
 - **The quieter you need it, the quieter MERA gets.** The character barely moves while you ground, almost disappears in phone-down mode, and only softly reappears when you return.
 - **No** feeds, notifications, streaks, achievements, social features, articles or chatbots.
+
+The most important part of MERA happens away from MERA.
 
 ## Touch Grass fit
 
@@ -66,7 +86,9 @@ The honest question is: _couldn't these missions just come from a list?_ The fal
 4. **Gentle patterns.** Observations counted in code (_"Walking helped in 3 of the 4 recent resets that included it"_). Gemma may rephrase them; every number is checked.
 5. **Open weights → local inference.** Gemma 3 1B runs in a Web Worker in your browser (WebGPU or WebAssembly). If it's unavailable, slow or fails validation, the library takes over, still personalized by the same signals.
 
-### Personalization signals
+**What Gemma does, and what plain code does.** Gemma personalizes the reset and Daily reset missions, writes the short reflection, and rephrases pattern observations. Deterministic code runs the grounding sequence, breathing, senses, the phone-down timer and time back in the world, every safety rule and check on Gemma's answers, the offline library, and all pattern counting. AI is used where it adds something, not everywhere.
+
+## How personalization works
 
 History stays on the device. What a model sees is a handful of ids, each rebuilt into words on whichever side reads it, so no free text is ever sent:
 
@@ -125,13 +147,21 @@ The **About** screen in the app has a **Run a mission request** button. It runs 
 | **Remote AI** (Connected Gemma, opt-in) | MERA's server receives the tapped feeling, reset settings, coarse time of day and **signal ids**, rebuilds MERA's own prompts, and calls the configured Gemma endpoint (Gemma 4 on Cloudflare Workers AI for the live demo). Never location, journal, voice or photos. A note's text is sent only if you separately allow it. MERA's code doesn't store or log request content. Cloudflare's platform logs record request metadata (path, status, timing), not bodies. |
 | **Offline fallback** | The built-in library, personalized by the same signals with simple rules. No network. |
 
-The current mode is always visible (`LOCAL AI` · `CONNECTED AI` · `OFFLINE RESET`) on Home, on every mission, and in About.
+## AI modes
+
+| Indicator | Mode | In plain words |
+| --- | --- | --- |
+| `LOCAL AI` | Local Gemma | Mission personalization runs on this device. |
+| `CONNECTED AI` | Connected Gemma (opt-in) | Mission personalization uses MERA's configured AI service. |
+| `OFFLINE RESET` | Offline reset | MERA is using its built-in grounding mission library. |
+
+The current mode shows on Home, on every mission, in Settings and in About. It's never in the way during grounding.
 
 **Controls (all real, all tested):** Export my data (JSON) · Delete reset history · Delete journal · Delete all local data · Disable AI analysis of notes · Reset personalization · Remove the downloaded model. No analytics, no trackers, nothing sold. Voice notes are stored as audio only and are **not transcribed**.
 
 ## How fallback works
 
-Model output → first balanced JSON object → **Zod schema** → **safety rules** (no traffic, strangers, unfamiliar places, night outdoors, strenuous activity, bare feet, tools, medical behaviour, screens or journaling; indoor-only, low-mobility, no-sound and no-smell respected; no clinical, crisis, dependency or hype language) → **personalization check** (cited signals must exist, reason grounded, numbers match). Failure → **one repair retry** → failure again → **library**. Timeouts and network errors go straight to the library. Raw model text is never rendered.
+Model output → first balanced JSON object → **Zod schema** → **safety rules** (no traffic, strangers, unfamiliar places, night outdoors, strenuous activity, bare feet, tools, medical behaviour, screens or journaling; indoor-only, low-mobility, no-sound and no-smell respected; no clinical, crisis, dependency or hype language) → **personalization check** (cited signals must exist, reason grounded, numbers match). Failure → **one repair retry** → failure again → **library**. Timeouts and network errors go straight to the library, and each mission request has a **15-second budget**: if Gemma isn't done by then, the library answers, so nobody waits on a model. If storage fails (private mode, full disk), the reset still finishes. Raw model text is never rendered.
 
 ## Architecture
 
@@ -230,6 +260,16 @@ Home → **GROUND ME** → _I'm here_ → feet on the ground → one breath → 
 
 Complete → **Save a summary image** creates a private PNG with only the mission title, time back in the world and the date (no notes or feelings), for documenting it.
 
+## Screenshots
+
+| Light | Dusk (dark) |
+| --- | --- |
+| <img src="docs/screenshots/light-00-welcome.png" width="220" alt="Welcome" /> | <img src="docs/screenshots/dark-01-home.png" width="220" alt="Home in dusk mode" /> |
+| <img src="docs/screenshots/light-04-breathing.png" width="220" alt="Breathing, with I'm ready to step away" /> | <img src="docs/screenshots/dark-07-mission.png" width="220" alt="Mission with Why this reset? open" /> |
+| <img src="docs/screenshots/light-09-phone-down.png" width="220" alt="Phone-down mode" /> | <img src="docs/screenshots/dark-12-complete.png" width="220" alt="Reset complete: time back in the world" /> |
+
+All screenshots are in `docs/screenshots/` (phone size, captured with `scripts/screenshots.ts`, light and dark). They come from a browser, not a physical phone.
+
 ## Testing
 
 ```bash
@@ -244,7 +284,7 @@ npm run eval        # real-model mission evaluation (downloads Gemma 3 1B, CPU)
 **End to end:**
 - The full flow, and the quick path to a personalized mission in under 90 s.
 - "Worse" → *Try a different reset*.
-- Phone-down surviving a refresh.
+- Phone-down surviving a refresh, and a timer that ends while the screen is off (MERA waits, and that time counts).
 - Offline use, delete-all, and first-run onboarding.
 - **axe-core (WCAG 2.2 AA) on 14 screens in light and dark.**
 - No horizontal scroll at 320, 360, 375, 390, 414 and 430 px.

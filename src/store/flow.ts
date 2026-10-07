@@ -25,7 +25,10 @@ export const useFlow = create<FlowStore>()(
       // A flow abandoned long ago shouldn't greet someone days later.
       merge: (persisted, current) => {
         const p = (persisted as { flow?: FlowState } | undefined)?.flow;
-        if (!p || !p.startedAt || Date.now() - p.startedAt > 6 * 60 * 60 * 1000) return current;
+        // Someone who put the phone down (or came back to it) can still finish that reset the next day.
+        const waiting = p?.step === "PHONE_DOWN" || p?.step === "RETURN" || p?.step === "REFLECTION";
+        const maxAge = (waiting ? 24 : 6) * 60 * 60 * 1000;
+        if (!p || !p.startedAt || Date.now() - p.startedAt > maxAge) return current;
         // Mid-generation can't resume a model call; go back to the check-in.
         const flow = p.step === "MISSION_GENERATION" ? { ...p, step: "EMOTION_CHECK" as const } : p;
         return { ...current, flow };

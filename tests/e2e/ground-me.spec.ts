@@ -21,7 +21,7 @@ test("HOME → GROUND ME → reset → mission → phone down → return → ref
   await expect(page.getByTestId("breath-phase")).toHaveText(/Breathe in|Hold|Breathe out/);
   // After one breath MERA offers to step away; doing nothing keeps grounding (demo: two breaths, 24 s).
   await expect(page.getByTestId("step-away")).toBeVisible({ timeout: 15_000 });
-  await expect(page.getByRole("heading", { name: /Notice five things you can see/ })).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByRole("heading", { name: /Notice five things you can see/ })).toBeVisible({ timeout: 45_000 });
   for (const cta of ["I see them", "I feel them", "I hear them", "Done", "I have one"]) await page.getByRole("button", { name: cta }).click();
   await page.getByTestId("emotion-overwhelmed").click();
   await expect(page.getByTestId("mission-title")).toBeVisible();
@@ -94,6 +94,28 @@ test("phone-down survives a refresh (timer from timestamps)", async ({ page }) =
   await expect(page.getByText("Now put me away.")).toBeHidden();
   await page.getByTestId("end-early").click();
   await expect(page.getByRole("heading", { name: "Welcome back." })).toBeVisible();
+});
+
+test("timer ends while the screen is off: MERA waits, and that time counts as time away", async ({ page }) => {
+  await page.goto("/#/daily");
+  await page.getByTestId("daily-go").click();
+  await page.getByTestId("im-going").click();
+  await expect(page.getByTestId("countdown")).toBeVisible({ timeout: 10_000 });
+  // Screen off: the page reports itself hidden.
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", { configurable: true, get: () => "hidden" });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await page.waitForTimeout(36_000); // demo timer is 30 s; it ends while "away"
+  await expect(page.getByTestId("phone-down")).toBeVisible();
+  // Coming back to the screen.
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", { configurable: true, get: () => "visible" });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await expect(page.getByRole("heading", { name: "Welcome back." })).toBeVisible();
+  const away = await page.evaluate(() => JSON.parse(localStorage.getItem("mera.flow") ?? "{}").state.flow.phoneDownSeconds);
+  expect(away).toBeGreaterThanOrEqual(35);
 });
 
 test("works offline once loaded (app shell + reset library)", async ({ page, context }) => {

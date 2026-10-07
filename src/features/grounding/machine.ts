@@ -58,6 +58,8 @@ export interface FlowState {
   phoneDownSeconds: number;
   /** True if the timer ran out; false if the person ended early. */
   phoneDownCompleted: boolean;
+  /** When the person actually came back to the screen. */
+  phoneDownReturnedAt: number | null;
   outcome: Outcome | null;
   reflectionId: string | null;
   insight: string | null;
@@ -77,6 +79,7 @@ export const initialState: FlowState = {
   phoneDownPlannedSeconds: 0,
   phoneDownSeconds: 0,
   phoneDownCompleted: false,
+  phoneDownReturnedAt: null,
   outcome: null,
   reflectionId: null,
   insight: null,
@@ -170,10 +173,11 @@ export function transition(s: FlowState, e: FlowEvent): FlowState {
       }
       return s;
     case "PHONE_DOWN":
-      if (e.type === "PHONE_DOWN_FINISHED") return { ...s, step: "RETURN", phoneDownSeconds: phoneDownElapsed(s, e.now), phoneDownCompleted: true };
+      if (e.type === "PHONE_DOWN_FINISHED")
+        return { ...s, step: "RETURN", phoneDownSeconds: phoneDownElapsed(s, e.now), phoneDownCompleted: true, phoneDownReturnedAt: e.now };
       if (e.type === "END_EARLY") {
         const ended = { ...s, phoneDownEndsAt: Math.min(e.now, s.phoneDownEndsAt ?? e.now) };
-        return { ...ended, step: "RETURN", phoneDownSeconds: phoneDownElapsed(ended, e.now), phoneDownCompleted: false };
+        return { ...ended, step: "RETURN", phoneDownSeconds: phoneDownElapsed(ended, e.now), phoneDownCompleted: false, phoneDownReturnedAt: e.now };
       }
       return s;
     case "RETURN":

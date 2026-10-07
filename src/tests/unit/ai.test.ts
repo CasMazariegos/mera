@@ -83,6 +83,28 @@ describe("model output validation", () => {
     expect(unsafeMissionReason(m, req)).toBeNull();
   });
 
+  it("a slow or hanging model never holds up a reset: the library answers within the time budget", async () => {
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = () => new Promise<Response>(() => {}); // Connected AI that never answers
+    try {
+      const ai = createMeraAI(() => ({ mode: "remote", reflectionAnalysis: true, allowNotesRemote: false }), { missionMs: 50, textMs: 50 });
+      const t0 = Date.now();
+      const m = await ai.generateResetMission(req);
+      expect(m.source).toBe("library");
+      expect(Date.now() - t0).toBeLessThan(1000);
+      const r = await ai.summarizeReflection({ emotion: "sad", missionTitle: "x", missionCategory: "nature", outcome: "same", minutesAway: 3 });
+      expect(r.source).toBe("fallback");
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+  });
+
+  it("malformed output twice (not JSON, then wrong shape) is never shown", async () => {
+    await expect(new GemmaProvider(scripted("Sure! Here is a mission: go outside", '{"title": 7}')).generateResetMission(req)).rejects.toBeInstanceOf(
+      ProviderError,
+    );
+  });
+
   it("indoor-only and night rules are enforced on model output", () => {
     const outdoor = {
       title: "Sky",
