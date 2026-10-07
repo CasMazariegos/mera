@@ -1,10 +1,10 @@
 /** Scenes 9–12: welcome back, optional reflection, a short honest insight, release. */
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
-import { Camera, Clock, Mic, PenLine, Sprout, type LucideIcon } from "lucide-react";
+import { Camera, Download, Mic, PenLine, Sprout, type LucideIcon } from "lucide-react";
 import { MeraCharacter } from "@/components/MeraCharacter";
 import { EMOTION_ICON, EMOTION_TINT, OUTCOME_ICON, Sparkles } from "@/components/icons";
-import { Button, Eyebrow } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { useFlow } from "@/store/flow";
 import { useSettings } from "@/store/settings";
 import { meraAI } from "@/ai";
@@ -14,6 +14,8 @@ import { takeBeforePhoto } from "@/store/photos";
 import { VoiceRecorder } from "@/features/reflections/VoiceRecorder";
 import { EMOTION_LABEL, OUTCOME_LABEL, type JournalEntry, type Outcome } from "@/types";
 import { Scene } from "../Scene";
+import { resetRecordFrom, timeAway } from "../record";
+import { downloadSummaryCard } from "@/lib/summaryCard";
 
 const OUTCOMES: Array<{ value: Outcome; label: string; tint: string }> = [
   { value: "better", label: "Better", tint: "var(--accent-soft)" },
@@ -71,6 +73,8 @@ export function ReflectionScene() {
   const flow = useFlow((s) => s.flow);
   const send = useFlow((s) => s.send);
   const [mode, setMode] = useState<"choose" | "type" | "voice">("choose");
+  const [noteAnyway, setNoteAnyway] = useState(false);
+  const demo = useSettings((s) => s.demo);
   const [text, setText] = useState("");
   const [after, setAfter] = useState<Blob | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -93,6 +97,19 @@ export function ReflectionScene() {
     };
     await db.journal.put(entry);
     send({ type: "REFLECTION_SAVED", reflectionId: entry.id });
+  }
+
+  function skip() {
+    const before = takeBeforePhoto();
+    if (before) void save({ kind: "text", text: "", photo: before, photoMime: before.type });
+    else send({ type: "SKIP_REFLECTION" });
+  }
+
+  /** Save this reset as it was ("worse" is useful history), then go straight to a different mission. */
+  async function tryAnother() {
+    takeBeforePhoto();
+    await saveReset(resetRecordFrom(flow, { demo }));
+    send({ type: "TRY_ANOTHER", resetId: newId(), now: Date.now() });
   }
 
   const photoPicker = (
@@ -162,6 +179,28 @@ export function ReflectionScene() {
       </Scene>
     );
   }
+  if (flow.outcome === "worse" && mode === "choose" && !noteAnyway) {
+    return (
+      <Scene
+        title="Thanks for checking back in."
+        footer={
+          <>
+            <Button onClick={() => void tryAnother()} data-testid="try-another">
+              Try a different reset
+            </Button>
+            <Button variant="quiet" onClick={() => setNoteAnyway(true)}>
+              Leave a note
+            </Button>
+            <Button variant="ghost" onClick={skip} data-testid="finish-for-now">
+              Finish for now
+            </Button>
+          </>
+        }
+      >
+        <p className="mt-5 max-w-xs text-h3 text-balance text-ink-2">That one didn’t help this time. That’s useful to know.</p>
+      </Scene>
+    );
+  }
   const choices = [
     { key: "voice", label: "Voice", hint: "Say it, keep it", icon: Mic, tint: "var(--sky-soft)", onClick: () => setMode("voice"), testid: "voice-note" },
     { key: "type", label: "Type", hint: "A line or two", icon: PenLine, tint: "var(--sand-soft)", onClick: () => setMode("type"), testid: "type-note" },
@@ -170,15 +209,7 @@ export function ReflectionScene() {
     <Scene
       title="Want to leave yourself a note?"
       footer={
-        <Button
-          variant="ghost"
-          onClick={() => {
-            const before = takeBeforePhoto();
-            if (before) void save({ kind: "text", text: "", photo: before, photoMime: before.type });
-            else send({ type: "SKIP_REFLECTION" });
-          }}
-          data-testid="skip-note"
-        >
+        <Button variant="ghost" onClick={skip} data-testid="skip-note">
           Skip
         </Button>
       }
@@ -232,21 +263,7 @@ export function AiReflectionScene() {
         minutesAway,
         note: note || undefined,
       });
-      const startedAt = flow.startedAt ?? Date.now();
-      await saveReset({
-        id: flow.resetId ?? newId(),
-        startedAt,
-        emotion: flow.emotion,
-        mission: flow.mission,
-        phoneDownSeconds: flow.phoneDownSeconds,
-        outcome: flow.outcome,
-        quiet: flow.quiet,
-        hour: new Date(startedAt).getHours(),
-        completedAt: Date.now(),
-        reflectionId: flow.reflectionId ?? undefined,
-        insight: summary.text,
-        demo: demo || undefined,
-      });
+      await saveReset(resetRecordFrom(flow, { insight: summary.text, demo }));
       send({ type: "INSIGHT_READY", insight: summary.text });
     })();
   }, [flow, send, demo]);
@@ -277,7 +294,8 @@ export function CompleteScene() {
     });
   }, []);
 
-  const minutes = Math.max(1, Math.round(flow.phoneDownSeconds / 60));
+  const away = timeAway(flow.phoneDownSeconds);
+  const [saved, setSaved] = useState(false);
   return (
     <Scene
       labelledBy="complete-title"
@@ -287,38 +305,30 @@ export function CompleteScene() {
         </Button>
       }
     >
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-        className="relative"
-      >
-        <span aria-hidden className="absolute inset-0 -m-6 rounded-full bg-sunrise-soft/70 blur-2xl" />
-        <div className="relative">
-          <MeraCharacter state="celebrating" size={104} />
-        </div>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}>
+        <MeraCharacter state="resting" size={72} />
       </motion.div>
-      <Eyebrow className="mt-6">Reset complete</Eyebrow>
-      <h1 id="complete-title" tabIndex={-1} className="sr-only">
-        Reset complete
+      {/* The one number MERA cares about. */}
+      <h1 id="complete-title" tabIndex={-1} className="mt-4 outline-none" data-testid="back-in-world">
+        <span className="block font-display text-[5.5rem] leading-none font-light text-accent-strong tabular">{away.value}</span>
+        <span className="mt-2 block font-display text-h2 font-normal text-ink italic">{away.unit} back in the world.</span>
       </h1>
-      <dl className="mt-5 grid w-full grid-cols-3 gap-2.5 text-center" data-testid="recap">
+      <dl className="mt-7 grid w-full grid-cols-2 gap-2.5 text-center" data-testid="recap">
         <Stat
           label="You started"
           value={flow.emotion ? EMOTION_LABEL[flow.emotion] : "—"}
           icon={flow.emotion ? EMOTION_ICON[flow.emotion] : Sparkles}
           tint={flow.emotion ? EMOTION_TINT[flow.emotion] : "var(--surface-sunk)"}
         />
-        <Stat label="Time away" value={flow.phoneDownSeconds < 60 ? `${flow.phoneDownSeconds} sec` : `${minutes} min`} icon={Clock} tint="var(--sand-soft)" />
         <Stat
-          label="Now"
+          label="Afterwards"
           value={flow.outcome ? OUTCOME_LABEL[flow.outcome] : "—"}
           icon={flow.outcome ? OUTCOME_ICON[flow.outcome] : Sprout}
           tint="var(--accent-soft)"
         />
       </dl>
       {(flow.insight || pattern) && (
-        <div className="glass mt-4 w-full rounded-[var(--radius-soft)] p-5 text-left shadow-gentle">
+        <div className="glass mt-3 w-full rounded-[var(--radius-soft)] p-5 text-left shadow-gentle">
           {flow.insight && (
             <p className="text-body text-ink" data-testid="insight">
               {flow.insight}
@@ -333,6 +343,19 @@ export function CompleteScene() {
         </div>
       )}
       <p className="mt-8 font-display text-h1 font-normal text-ink italic">Go live your life.</p>
+      {flow.mission && flow.phoneDownSeconds > 0 && (
+        <button
+          type="button"
+          onClick={() =>
+            void downloadSummaryCard({ missionTitle: flow.mission!.title, seconds: flow.phoneDownSeconds, date: new Date() }).then(() => setSaved(true))
+          }
+          className="mt-4 inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-small text-ink-2 underline underline-offset-4 hover:text-ink"
+          data-testid="save-card"
+        >
+          <Download aria-hidden className="size-4" />
+          {saved ? "Saved to this device" : "Save a summary image (no notes included)"}
+        </button>
+      )}
     </Scene>
   );
 }

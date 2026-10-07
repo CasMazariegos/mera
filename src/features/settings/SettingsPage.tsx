@@ -5,9 +5,10 @@ import { Button, Page, Segmented, Toggle } from "@/components/ui";
 import { useSettings, type AiMode } from "@/store/settings";
 import { disableLocal, enableLocal, expectedDownloadBytes, removeLocalDownload, retryLocal, useLocalModel } from "@/ai/local/manager";
 import { LOCAL_MODEL } from "@/ai/local/protocol";
-import { deleteAllData, deleteDemoData, exportAll } from "@/data/db";
+import { deleteAllData, deleteDemoData, deleteJournal, deleteResetHistory, exportAll } from "@/data/db";
 import { addSampleHistory } from "@/data/demo";
 import { download } from "@/lib/download";
+import { navigate } from "@/app/router";
 import { useAiStatus } from "@/hooks/useAiStatus";
 
 function LocalModelPanel() {
@@ -135,7 +136,7 @@ export function SettingsPage() {
   const s = useSettings();
   const server = useServerConfig();
   const status = useAiStatus();
-  const [confirm, setConfirm] = useState(false);
+  const [confirm, setConfirm] = useState<null | "all" | "resets" | "journal">(null);
   const [msg, setMsg] = useState<string | null>(null);
 
   return (
@@ -229,9 +230,29 @@ export function SettingsPage() {
         />
         <Toggle id="avoid-sound" label="Skip listening-based steps" checked={s.avoidSound} onChange={(v) => s.set({ avoidSound: v })} />
         <Toggle id="avoid-smell" label="Skip smell-based steps" checked={s.avoidSmell} onChange={(v) => s.set({ avoidSmell: v })} />
-        <Button variant="ghost" onClick={() => (s.resetPersonalization(), setMsg("Reset preferences restored to defaults."))}>
-          Reset personalization
-        </Button>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <Button
+            variant="quiet"
+            onClick={() => {
+              s.set({ personalizationSince: Date.now() });
+              setMsg("Personalization reset. New missions won’t draw on resets or notes from before now. Your history is still here.");
+            }}
+            data-testid="reset-personalization"
+          >
+            Reset personalization
+          </Button>
+          <Button variant="ghost" onClick={() => (s.resetPersonalization(), setMsg("Reset preferences restored to defaults."))}>
+            Restore default preferences
+          </Button>
+        </div>
+        {s.personalizationSince && (
+          <p className="mt-2 text-small text-ink-2">
+            Personalizing from {new Date(s.personalizationSince).toLocaleDateString()} onward.{" "}
+            <button type="button" className="min-h-11 underline underline-offset-4" onClick={() => s.set({ personalizationSince: null })}>
+              Use all history again
+            </button>
+          </p>
+        )}
       </section>
 
       <section aria-labelledby="comfort-h" className="mt-10 border-t border-line pt-6">
@@ -295,30 +316,48 @@ export function SettingsPage() {
           <Button variant="quiet" onClick={() => void exportAll().then((b) => download(b, `mera-export-${new Date().toISOString().slice(0, 10)}.json`))}>
             Export everything
           </Button>
-          {confirm ? (
-            <>
+          <Button variant="ghost" onClick={() => setConfirm("resets")} data-testid="delete-resets">
+            Delete reset history
+          </Button>
+          <Button variant="ghost" onClick={() => setConfirm("journal")} data-testid="delete-journal">
+            Delete journal
+          </Button>
+          <Button variant="ghost" onClick={() => setConfirm("all")} data-testid="delete-all">
+            Delete all data
+          </Button>
+        </div>
+        {confirm && (
+          <div role="alertdialog" aria-labelledby="confirm-h" className="mt-4 rounded-[var(--radius-soft)] border border-warning/50 bg-surface p-4">
+            <p id="confirm-h" className="text-body font-semibold text-ink">
+              {confirm === "all"
+                ? "Delete every reset, note, voice note, photo and check-in on this device?"
+                : confirm === "resets"
+                  ? "Delete your reset history? Patterns and personalization start over."
+                  : "Delete all journal notes, voice notes and photos?"}
+            </p>
+            <p className="mt-1 text-small text-ink-2">This can’t be undone. Export first if you want a copy.</p>
+            <div className="mt-3 flex flex-wrap gap-2">
               <Button
                 variant="quiet"
                 className="border-warning text-warning"
                 onClick={async () => {
-                  await deleteAllData();
-                  setConfirm(false);
-                  setMsg("All MERA data on this device was deleted.");
+                  const which = confirm;
+                  if (which === "all") await deleteAllData();
+                  else if (which === "resets") await deleteResetHistory();
+                  else await deleteJournal();
+                  setConfirm(null);
+                  setMsg(which === "all" ? "All MERA data on this device was deleted." : which === "resets" ? "Reset history deleted." : "Journal deleted.");
                 }}
                 data-testid="delete-all-confirm"
               >
-                Yes, delete everything
+                Yes, delete
               </Button>
-              <Button variant="ghost" onClick={() => setConfirm(false)}>
+              <Button variant="ghost" onClick={() => setConfirm(null)}>
                 Cancel
               </Button>
-            </>
-          ) : (
-            <Button variant="ghost" onClick={() => setConfirm(true)} data-testid="delete-all">
-              Delete all data
-            </Button>
-          )}
-        </div>
+            </div>
+          </div>
+        )}
       </section>
 
       <section aria-labelledby="demo-h" className="mt-10 border-t border-line pt-6">
@@ -328,12 +367,26 @@ export function SettingsPage() {
         <Toggle
           id="demo"
           label="Demo mode"
-          hint="Shorter timers (30-second phone-down) for presentations. Everything else is real."
+          hint="Shorter timers (30-second phone-down, and the step-away choice after one breath) for presentations. The AI and everything else is real."
           checked={s.demo}
           onChange={(v) => s.set({ demo: v })}
         />
         <div className="flex flex-wrap gap-3">
-          <Button variant="quiet" onClick={() => void addSampleHistory().then((n) => setMsg(`Added ${n} sample resets (labelled “sample”).`))}>
+          <Button
+            onClick={() =>
+              void addSampleHistory().then(() => {
+                s.set({ demo: true, onboarded: true, personalizationSince: null });
+                navigate("/");
+              })
+            }
+            data-testid="judge-demo"
+          >
+            Set up judge demo
+          </Button>
+          <Button
+            variant="quiet"
+            onClick={() => void addSampleHistory().then((n) => setMsg(`Added ${n} sample resets and 2 sample notes (labelled “sample”).`))}
+          >
             Add sample history
           </Button>
           <Button variant="ghost" onClick={() => void deleteDemoData().then(() => setMsg("Sample history removed."))}>

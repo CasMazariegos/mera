@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { EmptyState, Page } from "@/components/ui";
 import { meraAI } from "@/ai";
 import { completedResets, db } from "@/data/db";
-import { detectPatterns, MIN_RESETS_FOR_PATTERNS } from "./patterns";
+import { detectPatterns, minutesThisWeek, MIN_RESETS_FOR_PATTERNS } from "./patterns";
 import { EMOTION_LABEL, OUTCOME_LABEL, type ResetRecord } from "@/types";
 import type { PatternResult } from "@/ai/providers/types";
 
@@ -42,8 +42,13 @@ export function PatternsPage() {
       icon={Sprout}
       eyebrow="My patterns"
       title="What seems to help"
-      intro="Observations from your own resets, on this device. Not conclusions — just what you might notice too."
+      intro="Observations from your own resets, on this device. Not conclusions, just what you might notice too."
     >
+      <div className="mb-6 rounded-[var(--radius-card)] border border-line/70 bg-surface px-6 py-6 text-center shadow-gentle" data-testid="week-minutes">
+        <p className="font-display text-[3.5rem] leading-none font-light text-accent-strong tabular">{minutesThisWeek(history)}</p>
+        <p className="mt-2 font-display text-h3 text-ink italic">minutes back in the world this week</p>
+        <p className="mt-2 text-micro text-muted">Time spent away from the screen during resets. Not a goal, just a quiet count.</p>
+      </div>
       {patterns.length === 0 ? (
         <EmptyState
           title="Nothing to analyze yet."
@@ -51,8 +56,8 @@ export function PatternsPage() {
         />
       ) : (
         <ul className="space-y-3" data-testid="patterns">
-          {patterns.map((p) => (
-            <li key={p.key} className="rounded-[var(--radius-soft)] border border-line bg-surface px-5 py-4 text-body text-ink">
+          {patterns.slice(0, 3).map((p) => (
+            <li key={p.key} className="rounded-[var(--radius-soft)] border border-line/70 bg-surface px-5 py-4 text-body text-ink shadow-gentle">
               {p.text}
               <span className="mt-1 block text-micro text-muted">
                 {p.source === "fallback"
@@ -67,10 +72,13 @@ export function PatternsPage() {
       )}
 
       {history.length > 0 && (
-        <section className="mt-12" aria-labelledby="recent">
-          <h2 id="recent" className="text-h3 font-semibold text-ink">
-            Your recent resets
-          </h2>
+        <details className="group mt-10">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between text-body font-semibold text-ink">
+            Your recent resets ({history.length})
+            <span aria-hidden className="text-h3 text-ink-2 transition-transform group-open:rotate-45">
+              +
+            </span>
+          </summary>
           <p className="mt-1 text-small text-ink-2">Remove any reset and it’s no longer counted.</p>
           <ul className="mt-4 divide-y divide-line rounded-[var(--radius-soft)] border border-line bg-surface">
             {history.slice(0, 20).map((r) => (
@@ -97,7 +105,7 @@ export function PatternsPage() {
               </li>
             ))}
           </ul>
-        </section>
+        </details>
       )}
     </Page>
   );

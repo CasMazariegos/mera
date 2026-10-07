@@ -31,7 +31,7 @@ export interface AiPolicy {
 /** The provider that would run right now, before trying it. */
 export function activeProvider(p: AiPolicy): MeraAIProvider {
   if (p.mode === "local" && localUsable()) return localProvider;
-  if (p.mode === "remote" && (typeof navigator === "undefined" || navigator.onLine)) return remoteProvider;
+  if (p.mode === "remote" && (typeof navigator === "undefined" || navigator.onLine !== false)) return remoteProvider;
   return fallbackProvider;
 }
 
@@ -49,13 +49,26 @@ async function withFallback<T>(primary: MeraAIProvider, run: (p: MeraAIProvider)
   }
 }
 
+/**
+ * Themes matched from the person's notes ("note_theme:…") follow the same rules
+ * as the notes themselves: none when AI reflection analysis is off, and none to
+ * Connected AI unless notes are separately allowed there.
+ */
+export function notePrivacy(req: MissionRequest, pol: AiPolicy, provider: ProviderId): MissionRequest {
+  const allowed = pol.reflectionAnalysis && (provider !== "remote-gemma" || pol.allowNotesRemote);
+  return allowed ? req : { ...req, signals: req.signals.filter((id) => !id.startsWith("note_theme:")) };
+}
+
 export function createMeraAI(policy: () => AiPolicy) {
   return {
     generateResetMission(req: MissionRequest): Promise<GeneratedMission> {
-      return withFallback(activeProvider(policy()), (p) => p.generateResetMission(req));
+      const pol = policy();
+      const primary = activeProvider(pol);
+      return withFallback(primary, (p) => p.generateResetMission(notePrivacy(req, pol, p.id)));
     },
     generateDailyReset(req: MissionRequest): Promise<GeneratedMission> {
-      return withFallback(activeProvider(policy()), (p) => p.generateDailyReset(req));
+      const pol = policy();
+      return withFallback(activeProvider(pol), (p) => p.generateDailyReset(notePrivacy(req, pol, p.id)));
     },
     summarizeReflection(facts: ReflectionFacts): Promise<TextResult> {
       const pol = policy();

@@ -5,8 +5,9 @@
  */
 import type { MissionRequest } from "@/ai/schemas/mission";
 import type { LibraryMission } from "@/features/missions/library";
+import { signalText } from "@/features/missions/signals";
 
-export const PROMPT_VERSION = "2026-10-06.1";
+export const PROMPT_VERSION = "2026-10-07.1";
 
 export type ChatMessage = { role: "user" | "assistant"; content: string };
 
@@ -17,7 +18,10 @@ Rules:
 - Safe: no roads or traffic, no strangers, no unfamiliar places, nothing at night outside, no running or hard exercise, no bare feet, no tools, nothing medical.
 - If outdoor is not allowed, the mission must be indoors. At night, stay indoors or at the door.
 - Plain, calm words. No diagnosis, no advice about feelings, no exclamation marks.
-Reply with JSON only: {"title": string (max 5 words), "durationMinutes": number, "category": "nature"|"movement"|"sensory"|"indoor", "environment": "outdoor"|"indoor"|"either", "instruction": string, "secondaryInstruction": string}`;
+- Personalize: if "What has helped this person" is listed, build the mission around it (same kind of activity, adapted to how they feel now, not a copy of an old mission).
+- "reason": one short sentence saying which past results the mission is based on, as an observation ("has helped", "seemed to help"). Use only the listed facts and their numbers. If nothing is listed, use "".
+- "personalizationSignals": the ids (the part in [brackets]) of the listed facts you used. Never invent ids. If none, [].
+Reply with JSON only: {"title": string (max 5 words), "durationMinutes": number, "category": "nature"|"movement"|"sensory"|"indoor", "environment": "outdoor"|"indoor"|"either", "instruction": string, "secondaryInstruction": string, "reason": string, "personalizationSignals": string[]}`;
 
 function describe(req: MissionRequest): string {
   const helped = Object.entries(req.helped)
@@ -39,12 +43,15 @@ function describe(req: MissionRequest): string {
     helped ? `Helped before: ${helped}` : "",
     notHelped ? `Didn't help before: ${notHelped}` : "",
     req.recentTitles.length ? `Don't repeat: ${req.recentTitles.join(", ")}` : "",
+    req.signals.length
+      ? `What has helped this person (from their own past resets):\n${req.signals.map((id) => `- [${id}] ${signalText(id)}`).join("\n")}`
+      : 'What has helped this person: nothing yet, so reason is "" and personalizationSignals is [].',
   ]
     .filter(Boolean)
     .join("\n");
 }
 
-function exampleJson(m: LibraryMission): string {
+function exampleJson(m: LibraryMission, reason = "", signals: string[] = []): string {
   return JSON.stringify({
     title: m.title,
     durationMinutes: m.durationMinutes,
@@ -52,19 +59,34 @@ function exampleJson(m: LibraryMission): string {
     environment: m.environment,
     instruction: m.instruction,
     secondaryInstruction: m.secondaryInstruction ?? "",
+    reason,
+    personalizationSignals: signals,
   });
 }
 
+const EXAMPLE_REASON: Record<LibraryMission["category"], string> = {
+  nature: "Nature resets helped in 2 of your last 3 tries, so this one stays close to that.",
+  movement: "Movement resets helped in 2 of your last 3 tries, so this one keeps you moving gently.",
+  sensory: "Senses-based resets helped in 2 of your last 3 tries, so this one builds on that.",
+  indoor: "Indoor resets helped in 2 of your last 3 tries, so this one stays inside.",
+};
+
+/**
+ * Two worked examples (one without history, one with) teach the format, then
+ * the real request. The examples' history is synthetic and never mixed with the
+ * person's own.
+ */
 export function missionMessages(req: MissionRequest, examples: LibraryMission[]): ChatMessage[] {
   const msgs: ChatMessage[] = [];
   const [a, b] = examples;
   if (a) {
-    msgs.push({ role: "user", content: `${MISSION_RULES}\n\n${describe({ ...req, emotion: a.emotions[0] ?? "not_sure", recentTitles: [] })}` });
+    msgs.push({ role: "user", content: `${MISSION_RULES}\n\n${describe({ ...req, emotion: a.emotions[0] ?? "not_sure", recentTitles: [], signals: [] })}` });
     msgs.push({ role: "assistant", content: exampleJson(a) });
   }
   if (b) {
-    msgs.push({ role: "user", content: describe({ ...req, emotion: b.emotions[0] ?? "not_sure", recentTitles: [] }) });
-    msgs.push({ role: "assistant", content: exampleJson(b) });
+    const sig = `cat_helped:${b.category}:2:3`;
+    msgs.push({ role: "user", content: describe({ ...req, emotion: b.emotions[0] ?? "not_sure", recentTitles: [], signals: [sig] }) });
+    msgs.push({ role: "assistant", content: exampleJson(b, EXAMPLE_REASON[b.category], [sig]) });
   }
   msgs.push({ role: "user", content: a ? describe(req) : `${MISSION_RULES}\n\n${describe(req)}` });
   return msgs;

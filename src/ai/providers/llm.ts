@@ -16,6 +16,7 @@ import {
 } from "@/ai/prompts/prompts";
 import { numbersAreGrounded, unsafeMissionReason, unsafeTextReason } from "@/ai/safety/safety";
 import { examplesFor } from "@/features/missions/select";
+import { reasonFromSignals, signalNumbers } from "@/features/missions/signals";
 import type { GeneratedMission } from "@/types";
 import type { z } from "zod";
 import { ProviderError, type MeraAIProvider, type ModelTransport, type PatternResult, type TaskName, type TextResult } from "./types";
@@ -59,6 +60,27 @@ export function parseWith<S extends z.ZodTypeAny>(
   return why ? { ok: false, problem: why } : { ok: true, value: r.data };
 }
 
+const CLAIMS_HISTORY = /\b(before|previous\w*|last time|recent\w*|past|again|helped|worked|usually|tend)\b/i;
+
+/**
+ * "Why this reset?" must be true: cited ids must be ones MERA sent, a reason may
+ * only talk about the past if it cites something, and every number in it must
+ * come from a cited signal (or the mission's own minutes).
+ */
+export function personalizationProblem(v: { reason?: string; personalizationSignals: string[]; durationMinutes: number }, req: MissionRequest): string | null {
+  const given = new Set(req.signals);
+  // The repair prompt sees this problem text, so tell the model exactly which ids it may use.
+  if (v.personalizationSignals.some((id) => !given.has(id)))
+    return `invented_signal: personalizationSignals may only contain ${given.size ? [...given].join(", ") : "nothing; use []"}`.slice(0, 190);
+  if (!v.reason) return null;
+  const why = unsafeTextReason(v.reason, 2);
+  if (why) return `reason_${why}`;
+  if (!v.personalizationSignals.length && CLAIMS_HISTORY.test(v.reason)) return "unfounded_reason";
+  const allowed = [...v.personalizationSignals.flatMap(signalNumbers), v.durationMinutes];
+  if (!numbersAreGrounded(v.reason, allowed)) return "ungrounded_reason_numbers";
+  return null;
+}
+
 export class GemmaProvider implements MeraAIProvider {
   readonly id: ModelTransport["id"];
   private readonly transport: ModelTransport;
@@ -88,12 +110,21 @@ export class GemmaProvider implements MeraAIProvider {
 
   async generateResetMission(req: MissionRequest): Promise<GeneratedMission> {
     const msgs = missionMessages(req, examplesFor(req));
-    const m = await this.ask("mission", req, msgs, missionSchema, 160, (v) => {
+    const m = await this.ask("mission", req, msgs, missionSchema, 230, (v) => {
       if (v.durationMinutes > req.minutes) return "too_long_duration";
       if (req.recentTitles.includes(v.title)) return "repeated_title";
-      return unsafeMissionReason(v, req);
+      // Ids the model wasn't given are dropped, not trusted. A reason that then has nothing behind it fails the check below.
+      const given = new Set(req.signals);
+      v.personalizationSignals = v.personalizationSignals.filter((id) => given.has(id));
+      // No cited facts → no "why" is shown, so an unsupported reason is discarded rather than costing the mission.
+      if (!v.personalizationSignals.length) v.reason = undefined;
+      return unsafeMissionReason(v, req) ?? personalizationProblem(v, req);
     });
-    return { ...m, source: this.id };
+    const { personalizationSignals, reason, ...mission } = m;
+    // A reason with no cited signals can't claim anything about the past (checked above), so it adds nothing; drop it.
+    return personalizationSignals.length
+      ? { ...mission, reason: reason ?? reasonFromSignals(personalizationSignals), signals: personalizationSignals, source: this.id }
+      : { ...mission, source: this.id };
   }
 
   async generateDailyReset(req: MissionRequest): Promise<GeneratedMission> {

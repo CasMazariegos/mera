@@ -22,6 +22,8 @@ export interface Settings extends Preferences {
   haptics: boolean;
   /** Demo mode: shorter timers for presentations, clearly labelled. */
   demo: boolean;
+  /** "Reset personalization": missions ignore history from before this time. */
+  personalizationSince: number | null;
   /** Has seen the welcome and finished (or skipped) "get started". */
   onboarded: boolean;
   set: (patch: Partial<Settings>) => void;
@@ -51,6 +53,7 @@ export const useSettings = create<Settings>()(
       haptics: true,
       demo: false,
       onboarded: false,
+      personalizationSince: null,
       set: (patch) => set(patch),
       resetPersonalization: () => set({ ...DEFAULT_PREFERENCES }),
     }),

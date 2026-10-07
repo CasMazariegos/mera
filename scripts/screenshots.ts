@@ -32,14 +32,19 @@ for (const scheme of ["light", "dark"] as const) {
     );
   });
   await page.reload();
+  // Clearly labelled sample history, so personalization ("Why this reset?") is visible.
+  await page.goto(`${base}/#/settings`);
+  await page.getByTestId("judge-demo").click();
+  await page.getByTestId("ground-me").waitFor();
   await shot(page, `${scheme}-01-home`);
   await page.getByTestId("ground-me").click();
   await shot(page, `${scheme}-02-intro`);
   await page.getByTestId("start-reset").click();
   await shot(page, `${scheme}-03-body`);
   await page.getByTestId("continue").click();
-  await page.waitForTimeout(2500);
+  await page.getByTestId("step-away").waitFor({ timeout: 20_000 });
   await shot(page, `${scheme}-04-breathing`);
+  await page.getByTestId("keep-grounding").click();
   await page.getByRole("button", { name: "Skip breathing" }).click();
   await shot(page, `${scheme}-05-sense5`);
   for (let i = 0; i < 5; i++)
@@ -51,6 +56,7 @@ for (const scheme of ["light", "dark"] as const) {
   await page.getByTestId("emotion-overwhelmed").click();
   await page.getByTestId("outside-yes").click();
   await page.getByTestId("mission-title").waitFor();
+  await page.getByText("Why this reset?").click();
   await shot(page, `${scheme}-07-mission`);
   await page.getByTestId("im-going").click();
   await page.waitForTimeout(1500);
@@ -65,6 +71,8 @@ for (const scheme of ["light", "dark"] as const) {
   await page.getByTestId("recap").waitFor();
   await shot(page, `${scheme}-12-complete`);
   await page.getByTestId("done").click();
+  await page.goto(`${base}/#/patterns`);
+  await shot(page, `${scheme}-14-patterns`);
   await page.goto(`${base}/#/settings`);
   await shot(page, `${scheme}-13-privacy`);
   await ctx.close();

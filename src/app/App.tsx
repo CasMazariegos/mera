@@ -1,20 +1,23 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { MotionConfig } from "motion/react";
 import { useRoute, href } from "./router";
 import { useFlow } from "@/store/flow";
 import { useSettings } from "@/store/settings";
 import { GroundFlow } from "@/features/grounding/GroundFlow";
 import { Home } from "@/features/home/Home";
-import { DailyReset } from "@/features/daily-reset/DailyReset";
-import { CheckIn } from "@/features/check-in/CheckIn";
-import { PatternsPage } from "@/features/patterns/PatternsPage";
-import { JournalPage } from "@/features/journal/JournalPage";
-import { SettingsPage } from "@/features/settings/SettingsPage";
-import { AboutPage } from "@/features/about/AboutPage";
-import { Welcome } from "@/features/welcome/Welcome";
-import { GetStarted } from "@/features/welcome/GetStarted";
+
 import { GroundMeFab } from "@/components/GroundMe";
 import { daypart } from "@/lib/daypart";
+
+// Home and the reset flow load first; everything else loads when it's opened (and is precached for offline).
+const DailyReset = lazy(() => import("@/features/daily-reset/DailyReset").then((m) => ({ default: m.DailyReset })));
+const CheckIn = lazy(() => import("@/features/check-in/CheckIn").then((m) => ({ default: m.CheckIn })));
+const PatternsPage = lazy(() => import("@/features/patterns/PatternsPage").then((m) => ({ default: m.PatternsPage })));
+const JournalPage = lazy(() => import("@/features/journal/JournalPage").then((m) => ({ default: m.JournalPage })));
+const SettingsPage = lazy(() => import("@/features/settings/SettingsPage").then((m) => ({ default: m.SettingsPage })));
+const AboutPage = lazy(() => import("@/features/about/AboutPage").then((m) => ({ default: m.AboutPage })));
+const Welcome = lazy(() => import("@/features/welcome/Welcome").then((m) => ({ default: m.Welcome })));
+const GetStarted = lazy(() => import("@/features/welcome/GetStarted").then((m) => ({ default: m.GetStarted })));
 
 /** The sky follows the local time of day. */
 function useDaypart() {
@@ -114,16 +117,18 @@ export function App() {
       )}
       {/* While a reset runs, the rest of the app is hidden from view and from assistive tech. */}
       <div aria-hidden={inFlow || undefined} inert={inFlow || undefined} className={inFlow ? "hidden" : undefined}>
-        {page ? (
-          <SubPage>{page}</SubPage>
-        ) : route === "/start" ? (
-          <GetStarted />
-        ) : route === "/welcome" || !onboarded ? (
-          // First visit: explain MERA before anything else (GROUND ME is still one tap away on it).
-          <Welcome />
-        ) : (
-          <Home />
-        )}
+        <Suspense fallback={null}>
+          {page ? (
+            <SubPage>{page}</SubPage>
+          ) : route === "/start" ? (
+            <GetStarted />
+          ) : route === "/welcome" || !onboarded ? (
+            // First visit: explain MERA before anything else (GROUND ME is still one tap away on it).
+            <Welcome />
+          ) : (
+            <Home />
+          )}
+        </Suspense>
       </div>
       {inFlow && <GroundFlow />}
     </MotionConfig>

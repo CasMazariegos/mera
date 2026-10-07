@@ -11,7 +11,7 @@ export function remoteTransport(fetchImpl: typeof fetch = (...a) => fetch(...a))
   return {
     id: "remote-gemma",
     async complete(req: CompletionRequest) {
-      if (typeof navigator !== "undefined" && !navigator.onLine) throw new ProviderError("network", "offline");
+      if (typeof navigator !== "undefined" && navigator.onLine === false) throw new ProviderError("network", "offline");
       const abort = new AbortController();
       const timer = setTimeout(() => abort.abort(), TIMEOUT_MS);
       try {

@@ -8,6 +8,7 @@ import type { GeneratedMission, MissionCategory } from "@/types";
 import type { MissionRequest } from "@/ai/schemas/mission";
 import { unsafeMissionReason } from "@/ai/safety/safety";
 import { LIBRARY, type LibraryMission } from "./library";
+import { reasonFromSignals, signalBoost } from "./signals";
 
 export function eligible(m: LibraryMission, req: MissionRequest): boolean {
   if (req.canGoOutside === "indoor_only" && m.environment === "outdoor") return false;
@@ -27,6 +28,8 @@ export function score(m: LibraryMission, req: MissionRequest): number {
   const notHelped = req.notHelped[m.category] ?? 0;
   s += Math.min(3, helped) - Math.min(2, notHelped);
   if (req.recentTitles.includes(m.title)) s -= 4;
+  // What this person's own history says (same signals Gemma gets).
+  s += signalBoost(m, req.signals ?? []).boost;
   if (req.canGoOutside === "ask_each_time" && m.environment === "either") s += 1; // safe either way
   // Touch grass: when going out is possible, the outside world wins.
   if (req.canGoOutside === "yes" && req.timeOfDay !== "night") {
@@ -53,7 +56,9 @@ export function rankLibrary(req: MissionRequest, seed = ""): LibraryMission[] {
 /** Always returns a mission: the gentlest indoor one if nothing else fits. */
 export function selectMission(req: MissionRequest, seed = ""): GeneratedMission {
   const pick = rankLibrary(req, seed)[0] ?? LIBRARY.find((m) => m.id === "indoor-window-001")!;
-  return toMission(pick);
+  const { matched } = signalBoost(pick, req.signals ?? []);
+  const reason = reasonFromSignals(matched);
+  return reason ? { ...toMission(pick), reason, signals: matched } : toMission(pick);
 }
 
 export function toMission(m: LibraryMission): GeneratedMission {

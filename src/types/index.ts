@@ -45,6 +45,10 @@ export interface GeneratedMission extends Mission {
   source: MissionSource;
   /** Library id when the mission came from (or fell back to) the library. */
   libraryId?: string;
+  /** "Why this reset?" in one sentence, based only on this person's own history. */
+  reason?: string;
+  /** The personalization signal ids the reason is based on. */
+  signals?: string[];
 }
 
 /** The person's own preferences that shape missions. All local. */
@@ -65,7 +69,14 @@ export interface ResetRecord {
   startedAt: number;
   emotion: Emotion | null;
   mission: GeneratedMission | null;
+  /** Seconds actually away from the screen ("back in the world"). */
   phoneDownSeconds: number;
+  /** Planned phone-down length in seconds. */
+  plannedSeconds?: number;
+  /** True if the timer ran its course, false if ended early. */
+  timerCompleted?: boolean;
+  /** Quick ("I'm ready to step away") or full grounding. */
+  path?: "quick" | "full";
   outcome: Outcome | null;
   /** Whether the person chose "something quieter" for this reset. */
   quiet: boolean;

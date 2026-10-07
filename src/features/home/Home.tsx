@@ -4,14 +4,11 @@ import { ArrowRight, BookOpen, Compass, HeartHandshake, Settings2, Sprout, Sun, 
 import { MeraCharacter } from "@/components/MeraCharacter";
 import { GroundMeButton } from "@/components/GroundMe";
 import { Hills, Sky } from "@/components/Scenery";
-import { CATEGORY_ICON, CATEGORY_LABEL, CATEGORY_TINT, ENVIRONMENT_ICON, ENVIRONMENT_LABEL, Sparkles } from "@/components/icons";
+import { Sparkles } from "@/components/icons";
 import { href, type Route } from "@/app/router";
 import { useAiStatus } from "@/hooks/useAiStatus";
-import { useSettings } from "@/store/settings";
-import { useFlow } from "@/store/flow";
-import { completedResets, newId } from "@/data/db";
-import { buildMissionRequest, countWord, thisWeek } from "@/features/patterns/patterns";
-import { selectMission } from "@/features/missions/select";
+import { completedResets } from "@/data/db";
+import { countWord, minutesThisWeek, thisWeek } from "@/features/patterns/patterns";
 import { greeting } from "@/lib/daypart";
 import type { ResetRecord } from "@/types";
 
@@ -27,8 +24,6 @@ const DAY_MS = 86_400_000;
 
 export function Home() {
   const status = useAiStatus();
-  const prefs = useSettings();
-  const send = useFlow((s) => s.send);
   const [history, setHistory] = useState<ResetRecord[]>([]);
   const [now] = useState(() => new Date());
   useEffect(() => {
@@ -36,6 +31,7 @@ export function Home() {
   }, []);
 
   const week = thisWeek(history, now);
+  const minutes = minutesThisWeek(history, now);
   const days = useMemo(() => {
     const monday = new Date(now);
     monday.setHours(0, 0, 0, 0);
@@ -47,20 +43,6 @@ export function Home() {
     });
   }, [history, now]);
   const last = history.find((r) => r.insight);
-
-  // A small, local, deterministic suggestion from the library. No AI call just for opening the app.
-  const { canGoOutside, usualMinutes, lowMobility, avoidSound, avoidSmell } = prefs;
-  const suggestion = useMemo(() => {
-    const req = buildMissionRequest({
-      emotion: "not_sure",
-      prefs: { canGoOutside: canGoOutside === "ask_each_time" ? "yes" : canGoOutside, usualMinutes, lowMobility, avoidSound, avoidSmell },
-      history,
-      now,
-    });
-    return selectMission(req, now.toDateString());
-  }, [canGoOutside, usualMinutes, lowMobility, avoidSound, avoidSmell, history, now]);
-  const Cat = CATEGORY_ICON[suggestion.category];
-  const Env = ENVIRONMENT_ICON[suggestion.environment];
 
   return (
     <div className="relative min-h-[100dvh] overflow-x-hidden">
@@ -116,42 +98,8 @@ export function Home() {
         <div className="-mt-6 animate-rise text-center [animation-delay:240ms]">
           <GroundMeButton />
           <p className="mt-5 text-body text-ink-2">For when everything feels like too much.</p>
+          <p className="mt-1 text-small text-muted">A short grounding reset that ends outside the app.</p>
         </div>
-
-        {/* While it's calm: one small thing */}
-        <section
-          aria-labelledby="today-h"
-          className="mt-12 overflow-hidden rounded-[var(--radius-card)] border border-line/70 bg-surface shadow-gentle"
-          data-testid="home-suggestion"
-        >
-          <div className="flex items-center justify-between px-5 py-4" style={{ background: CATEGORY_TINT[suggestion.category] }}>
-            <h2 id="today-h" className="text-micro font-semibold tracking-[0.14em] text-ink uppercase">
-              While it’s calm · try this
-            </h2>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-surface/80 px-2.5 py-1 text-micro font-semibold text-ink">
-              <Cat aria-hidden className="size-3.5" strokeWidth={2} /> {CATEGORY_LABEL[suggestion.category]}
-            </span>
-          </div>
-          <div className="border-t-2 border-dashed border-line px-5 pt-4 pb-5">
-            <p className="font-display text-h2 font-medium text-ink">{suggestion.title}</p>
-            <p className="mt-1.5 text-body text-ink-2">{suggestion.instruction}</p>
-            <div className="mt-4 flex items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-3 text-micro font-semibold text-ink-2">
-                <span className="inline-flex items-center gap-1">
-                  <Env aria-hidden className="size-3.5" /> {ENVIRONMENT_LABEL[suggestion.environment]}
-                </span>
-                <span>{suggestion.durationMinutes} min</span>
-              </span>
-              <button
-                type="button"
-                onClick={() => send({ type: "START_MISSION", resetId: newId(), now: Date.now(), mission: suggestion })}
-                className="btn-primary inline-flex min-h-11 items-center gap-1.5 rounded-full px-5 text-small font-semibold"
-              >
-                Do it now <ArrowRight aria-hidden className="size-4" />
-              </button>
-            </div>
-          </div>
-        </section>
 
         {/* This week, gently. No streaks. */}
         <section
@@ -183,9 +131,13 @@ export function Home() {
             ))}
           </ol>
           <p className="mt-4 text-small text-ink">
-            {week > 0
-              ? `You made time for yourself ${countWord(week)} ${week === 1 ? "time" : "times"} this week.`
-              : "Nothing yet this week, and that’s fine. MERA is here when you need it."}
+            {week > 0 ? (
+              <>
+                <span className="font-semibold">{minutes} minutes back in the world</span> this week, over {countWord(week)} {week === 1 ? "reset" : "resets"}.
+              </>
+            ) : (
+              "Nothing yet this week, and that’s fine. MERA is here when you need it."
+            )}
           </p>
         </section>
 
@@ -257,6 +209,7 @@ export function Home() {
         </a>
 
         <footer className="mt-10 text-center text-micro text-muted">
+          <p className="mb-3 font-display text-small text-ink-2 italic">MERA is designed to help you leave MERA.</p>
           <a className="underline underline-offset-4 hover:text-ink" href={href("/about")}>
             About MERA
           </a>

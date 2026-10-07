@@ -1,13 +1,13 @@
 /** A lightweight check-in: one tap, an optional "how heavy", and an optional 2-minute reset. */
+import { missionRequestFor } from "@/features/missions/request";
 import { HeartHandshake } from "lucide-react";
 import { useState } from "react";
 import { Button, Page } from "@/components/ui";
-import { db, completedResets, newId } from "@/data/db";
+import { db, newId } from "@/data/db";
 import { meraAI } from "@/ai";
 import { useSettings } from "@/store/settings";
 import { useFlow } from "@/store/flow";
 import { navigate } from "@/app/router";
-import { buildMissionRequest } from "@/features/patterns/patterns";
 import { EMOTIONS, EMOTION_LABEL, type Emotion } from "@/types";
 
 const LEVELS = ["Very heavy", "Heavy", "In between", "Light", "Very light"];
@@ -29,12 +29,10 @@ export function CheckIn() {
   async function quickReset() {
     if (!emotion) return;
     setBusy(true);
-    const history = await completedResets(50);
-    const req = buildMissionRequest({
-      emotion,
-      prefs: { ...prefs, usualMinutes: 2, canGoOutside: prefs.canGoOutside === "ask_each_time" ? "indoor_only" : prefs.canGoOutside },
-      history,
-      now: new Date(),
+    const req = await missionRequestFor(emotion, {
+      ...prefs,
+      usualMinutes: 2,
+      canGoOutside: prefs.canGoOutside === "ask_each_time" ? "indoor_only" : prefs.canGoOutside,
     });
     const mission = await meraAI.generateResetMission(req);
     setBusy(false);

@@ -129,13 +129,27 @@ export function BreathingScene() {
 
   const scale = breathScale(m);
   const label = m.done ? "Good." : PHASE_LABEL[m.phase];
+  // After one full breath, the person decides: step away now, or keep grounding (the default if they do nothing).
+  const [keep, setKeep] = useState(false);
+  const offer = !keep && (m.cycle > 1 || m.done);
   return (
     <Scene
       labelledBy="breath-title"
       footer={
-        <Button variant="ghost" onClick={() => send({ type: "CONTINUE" })}>
-          Skip breathing
-        </Button>
+        offer ? (
+          <motion.div className="flex w-full flex-col gap-3" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+            <Button onClick={() => send({ type: "STEP_AWAY" })} data-testid="step-away">
+              I’m ready to step away
+            </Button>
+            <Button variant="ghost" onClick={() => setKeep(true)} data-testid="keep-grounding">
+              Keep grounding
+            </Button>
+          </motion.div>
+        ) : (
+          <Button variant="ghost" onClick={() => send({ type: "CONTINUE" })}>
+            Skip breathing
+          </Button>
+        )
       }
     >
       <h1 id="breath-title" className="sr-only">
@@ -193,9 +207,14 @@ export function SenseScene({ step }: { step: SenseScreen["step"] }) {
         </ol>
       }
       footer={
-        <Button onClick={() => send({ type: "SENSE_DONE" })} data-testid="sense-done">
-          {s.cta}
-        </Button>
+        <>
+          <Button onClick={() => send({ type: "SENSE_DONE" })} data-testid="sense-done">
+            {s.cta}
+          </Button>
+          <Button variant="ghost" onClick={() => send({ type: "STEP_AWAY" })} data-testid="sense-step-away">
+            I’m ready to step away
+          </Button>
+        </>
       }
     >
       <div className="relative flex items-center justify-center">

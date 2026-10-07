@@ -5,6 +5,7 @@
  */
 import { z } from "zod";
 import { CATEGORIES, EMOTIONS, ENVIRONMENTS } from "@/types";
+import { signalText } from "@/features/missions/signals";
 
 const sentence = (max: number) =>
   z
@@ -34,6 +35,20 @@ export const missionSchema = z.object({
       .nullable()
       .transform((v) => v ?? undefined),
   ),
+  /** "Why this reset?": one observational sentence, only about signals it was given. Checked in code. */
+  reason: z.preprocess(
+    (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+    sentence(170)
+      .optional()
+      .nullable()
+      .transform((v) => v ?? undefined),
+  ),
+  /** Ids of the personalization signals the mission was based on. Must be a subset of the ones sent. */
+  personalizationSignals: z
+    .array(z.string().max(48))
+    .max(4)
+    .nullish()
+    .transform((v) => v ?? []),
 });
 export type MissionOutput = z.infer<typeof missionSchema>;
 
@@ -62,5 +77,15 @@ export const missionRequestSchema = z.object({
   notHelped: z.partialRecord(z.enum(CATEGORIES), z.number().int().min(0).max(1000)),
   /** Titles used recently, so the AI avoids repeating them. */
   recentTitles: z.array(z.string().max(40)).max(5),
+  /** Personalization signal ids (see features/missions/signals). Ids only; the words are rebuilt from them. */
+  signals: z
+    .array(
+      z
+        .string()
+        .max(48)
+        .refine((id) => signalText(id) !== null, "unknown_signal"),
+    )
+    .max(6)
+    .default([]),
 });
 export type MissionRequest = z.infer<typeof missionRequestSchema>;

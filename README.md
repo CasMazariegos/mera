@@ -1,242 +1,275 @@
 # MERA
 
-**Meep Emotional Reset Assistant**
+### Meep Emotional Reset Assistant
 
-_Come back to yourself._
-Your Meep for the moments that feel like too much.
+**Come back to yourself.**
+
+MERA is an open-weight AI grounding companion designed to get you off your screen, not keep you on it.
+
+When everything feels like too much, press **GROUND ME**. MERA helps you pause, gives you **one personalized real-world reset**, then tells you to put your phone away.
 
 > MERA uses AI to shorten the digital experience, not extend it.
-> **MERA helps you leave MERA.**
+> **MERA is designed to help you leave MERA.**
+
+**Live:** https://mera.casmazariegos.workers.dev · Built for **Hacktoberfest 2026, Week 1: Touch Grass** · Targets: _Best Use of Gemma_, _Best Use of Render_
 
 <p>
-  <img src="docs/screenshots/light-01-home.png" width="200" alt="MERA home screen with the GROUND ME button" />
-  <img src="docs/screenshots/light-04-breathing.png" width="200" alt="Breathing with MERA" />
-  <img src="docs/screenshots/light-07-mission.png" width="200" alt="One real-world reset mission" />
-  <img src="docs/screenshots/light-09-phone-down.png" width="200" alt="Phone-down mode: just a quiet timer" />
+  <img src="docs/screenshots/light-01-home.png" width="190" alt="MERA home: Come back to yourself, and the GROUND ME button" />
+  <img src="docs/screenshots/light-04-breathing.png" width="190" alt="Breathing with MERA, with 'I'm ready to step away' after one breath" />
+  <img src="docs/screenshots/light-07-mission.png" width="190" alt="A personalized mission with 'Why this reset?' open" />
+  <img src="docs/screenshots/light-12-complete.png" width="190" alt="Reset complete: time back in the world" />
 </p>
 
 ---
 
-## Overview
+## What MERA is
 
-MERA is a mobile-first, installable web app (PWA) for the moments when everything feels like too much. You press one button — **GROUND ME** — and within a couple of taps MERA guides a 1–2 minute grounding sequence, then an open-weight **Gemma** model picks **one short real-world mission** for you. MERA asks you to put the phone away, waits quietly, and welcomes you back. Then it gets out of the way.
+A mobile-first, installable web app (PWA). One button starts a short grounding sequence. As soon as you're ready, MERA hands you **one** small real-world mission, chosen by **Gemma** from what has actually helped _you_ before. Then: _"Good. Now put me away. Go touch grass. I'll be here when you get back."_ A nearly empty timer screen waits while you're gone. When you come back, one tap says how it went, and MERA shows how long you were **back in the world**.
 
-It is built for the **Hacktoberfest 2026 Week 1 challenge: Touch Grass** — open-source AI that gets people off the screen and into the world.
+```
+CHAOS → "I'm here." → ground → breathe → "I'm ready to step away"
+      → one personalized Gemma mission → (Why this reset?) → "Good." → "Now put me away."
+      → REAL WORLD, phone down → "Welcome back." → better / same / worse
+      → optional note → one short insight → "6 minutes back in the world." → "Go live your life."
+```
 
-## Why MERA exists
+## Why it exists
 
 Most wellness apps still ask you to stare at your phone: feeds, streaks, long chats, content libraries. When you're overwhelmed, more screen is the last thing you need. MERA does the opposite: the outside world is supposed to win, and MERA's best outcome is that you close it.
 
-## Touch Grass challenge
+## The anti-engagement design
 
-| The challenge asks for…                  | MERA                                                                                                                                                             |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Open-source / open-weight AI at the core | Gemma chooses each real-world mission from how you feel and what has helped before, and writes the short after-reset reflection.                                 |
-| Getting people off the screen            | The core flow ends in **phone-down mode** — a nearly empty screen and a timer — after _"Good. Now put me away. Go touch grass. I'll be here when you get back."_ |
-| Why open matters                         | Emotional check-ins and journal notes are some of the most personal things people write. Gemma runs **in your browser**, so they don't have to leave the device. |
+Most apps measure success by how long you stay. **MERA measures how quickly it can help you leave.**
 
-## How it works
+- **The AI is intentionally brief.** Gemma returns one mission in strict JSON, plus a one-line reason. No chat.
+- **The quick path is under 90 seconds.** After one breath MERA offers _"I'm ready to step away"_. Keep grounding if you want, never because you have to.
+- **The phone-down screen is intentionally boring.** A timer, a tiny resting MERA, _Audio · Haptics · End early_. Nothing to read.
+- **The one number MERA shows is time away.** _"6 minutes back in the world."_ Not XP, points, streaks or badges. No comparisons, no shaming.
+- **The quieter you need it, the quieter MERA gets.** The character barely moves while you ground, almost disappears in phone-down mode, and only softly reappears when you return.
+- **No** feeds, notifications, streaks, achievements, social features, articles or chatbots.
 
-```
-AI → UNDERSTAND → GROUND → ACT → PHONE DOWN → REAL WORLD → RETURN → REFLECT
-```
+## Touch Grass fit
 
-### The GROUND ME flow
-
-| #   | Scene            | What happens                                                                                                                                          |
-| --- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Interruption     | _"I'm here." / "You don't have to figure everything out right now."_ — **Start reset** or **I need something quieter** (no sound, haptics or motion). |
-| 2   | Body             | _"Put both feet on the ground."_ (moves on by itself after ~9 s)                                                                                      |
-| 3   | Breath           | MERA _is_ the breathing guide: in 4 · hold 2 · out 6, three times. Words and numbers carry the timing; the animation only echoes them.                |
-| 4   | Senses           | 5-4-3-2-1, one screen per sense, **no typing**.                                                                                                       |
-| 5   | Check-in         | _"What feels closest right now?"_ — eight large choices, no writing.                                                                                  |
-| 6   | Mission          | Gemma (or the reset library) chooses **one** real-world mission, 2–10 minutes.                                                                        |
-| 7   | Signature moment | _"Good." → "Now put me away." → "Go touch grass. I'll be here when you get back."_                                                                    |
-| 8   | Phone down       | `04:58`, a tiny resting MERA, _Audio · Haptics · End early_. Nothing else.                                                                            |
-| 9   | Return           | _"Welcome back."_ — Better / About the same / Worse / Something else. No fake positivity.                                                             |
-| 10  | Reflection       | Optional: **Voice**, **Type** or **Skip** (+ optional before/after photo).                                                                            |
-| 11  | AI reflection    | 1–2 non-clinical sentences, e.g. _"Fresh air and movement seemed to help this time. I'll keep that in mind for future resets."_                       |
-| 12  | Complete         | Recap, one optional pattern, _"Go live your life."_ — then home, with no more content.                                                                |
-
-Also: **Daily Reset** (one proactive mission, no streaks — _"You made time for yourself three times this week."_), **Check In** (one tap + optional 2-minute reset), **My Patterns**, **Journal** (text, voice, photos, search, export, delete).
+| The challenge asks for… | MERA |
+| --- | --- |
+| Open-weight AI at the core | Gemma personalizes each real-world mission from your own history and explains why ("Walking was part of 4 resets that helped"). |
+| Getting people off the screen | Every reset ends in **phone-down mode**. Time away is measured from timestamps and is the product's main metric. |
+| Why open matters | Feelings and notes are some of the most personal things people write. Gemma can run **in your browser**, so they don't have to leave the device. |
 
 ## Why Gemma
 
-Gemma is MERA's intelligence layer, used where it adds something real:
+The honest question is: _couldn't these missions just come from a list?_ The fallback can, and MERA has one (23 safety-checked missions) so it never breaks offline. **Gemma is what makes the mission yours.**
 
-1. **Generating the reset mission** — from the feeling you tapped, your preferences (outdoors? minutes? low mobility? skip sound/smell?), the time of day, and _which kinds of resets helped or didn't_ in your own history.
-2. **Adapting to outcomes** — "better / same / worse" answers become counts that steer the next mission.
-3. **Summarizing a reflection** in 1–2 sentences (optionally reading your note, on-device).
-4. **Phrasing observed patterns** — the numbers are counted in code; Gemma may only rephrase them, and any number it uses must match.
+1. **Personalized missions.** MERA turns your history into small structured **signals** (below). Gemma builds a mission around them and adapts it to how you feel _now_. It doesn't just replay an old mission.
+2. **Why this reset?** Gemma returns a one-sentence reason and the ids of the signals it used. Code verifies that each cited signal was really given to it, that the reason makes no claims about your past without citing one, and that every number in the reason matches a cited fact.
+3. **Short reflections.** One or two sentences after a reset (your note is included only if you allow it).
+4. **Gentle patterns.** Observations counted in code (_"Walking helped in 3 of the 4 recent resets that included it"_). Gemma may rephrase them; every number is checked.
+5. **Open weights → local inference.** Gemma 3 1B runs in a Web Worker in your browser (WebGPU or WebAssembly). If it's unavailable, slow or fails validation, the library takes over, still personalized by the same signals.
 
-MERA deliberately asks Gemma for **less** text: strict JSON, short sentences, one instruction.
+### Personalization signals
+
+History stays on the device. What a model sees is a handful of ids, each rebuilt into words on whichever side reads it, so no free text is ever sent:
+
+| Signal id | Meaning |
+| --- | --- |
+| `feeling_helped:overwhelmed:movement` | Last time you felt overwhelmed, a movement reset helped. |
+| `cat_helped:movement:2:3` | Movement resets helped in 2 of the last 3 tries. |
+| `act_helped:walking:2` | Walking was part of 2 resets that helped. |
+| `cat_not_helped:indoor:2` | Indoor resets didn't help the last 2 times. |
+| `note_theme:fresh_air` | Your own notes mentioned fresh or cool air (matched **on device**; only the theme id is used). |
+
+`note_theme` signals follow the note-privacy rules. They're dropped when AI note analysis is off, and they never go to Connected AI unless you've allowed notes there. **Reset personalization** in Settings makes new missions ignore everything before that moment.
+
+### A real example (structured input → checked output)
+
+Captured on 2026-10-06 from the live deployment (Connected Gemma: Gemma 4 26B A4B on Workers AI) with `scripts/live-gemma-check.ts`, which runs MERA's real provider, checks and repair loop. History: two walks and a "walk around the block" that helped, one indoor reset that didn't change much, and a note saying _"Walking and the cool air helped."_
+
+```text
+Feeling: overstimulated · up to 5 min · outdoor allowed
+What has helped this person (from their own past resets):
+- [cat_helped:movement:2:2] Movement resets helped in 2 of the last 2 tries.
+- [act_helped:walking:2]    Walking was part of 2 resets that helped.
+- [note_theme:walking]      Your own notes mentioned walking.
+- [note_theme:fresh_air]    Your own notes mentioned fresh or cool air.
+```
+
+```text
+Cool Air Walk  [movement · outdoor · 5 min]
+Step outside and walk slowly for five minutes. Focus on the feeling of the air on your skin.
+Why: Movement and walking have helped in your past resets.
+Cited: cat_helped:movement:2:2, act_helped:walking:2, note_theme:walking, note_theme:fresh_air
+```
+
+Same history, other settings, same run:
+- **Indoor-only:** _"Slow Hallway Walk: walk slowly back and forth in a hallway or a clear space in your home."_
+- **Low mobility** (MERA drops walking and movement signals before asking): _"Texture of Nature: sit quietly outside and touch the texture of a nearby plant or stone."_
+- **No history:** a generic sound reset with no reason.
+
+The **About** screen in the app has a **Run a mission request** button. It runs exactly this against your own history and shows the structured input and the checked output, never hidden model text.
 
 ## Why open-weight AI
 
 > Some of the most personal things people write should not require sending those thoughts to a remote proprietary AI provider.
 
-- **Private inference** — Gemma 3 1B runs in a Web Worker in your browser (WebGPU, or WebAssembly on the CPU). Check-ins and notes are processed on your device.
-- **Offline** — after a one-time download, MERA's AI works without a connection; the reset library works offline from the first visit.
-- **Transparent and portable** — the model, prompts, validators and evaluation are all in this repo. Swap Gemma sizes or another open model by changing one ID.
-- **No per-user API keys, no lock-in** — the same prompts run on-device or behind any OpenAI-compatible Gemma endpoint.
-- **Tunable** — `src/ai/tuning` and `src/ai/evaluation` are ready for a MERA-tuned model, measured against the base.
+- **Private inference.** On-device Gemma means check-ins and notes are processed on your phone.
+- **Offline.** After a one-time download, the AI works without a connection. The reset library works offline from the first visit.
+- **Transparent and portable.** The model, prompts, validators and evaluation are all in this repo. Swap Gemma sizes or another open model by changing one id.
+- **No lock-in.** The same prompts run on-device or behind any OpenAI-compatible Gemma endpoint.
 
-## Privacy
+## How privacy works
 
-| Data                                                                     | Where it lives                                                                                                                                                                                                                                                                                                                                                       |
-| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Resets, feelings, outcomes, check-ins, journal text, voice notes, photos | **IndexedDB in your browser only** (Dexie). No account.                                                                                                                                                                                                                                                                                                              |
-| Preferences and privacy switches                                         | localStorage in your browser.                                                                                                                                                                                                                                                                                                                                        |
-| On-device model files                                                    | Cache Storage in your browser, after explicit consent (~784 MB GPU / ~1.7 GB CPU, shown before download). Removable.                                                                                                                                                                                                                                                 |
-| **Connected AI** (opt-in, off unless a server is configured)             | Only the tapped feeling, reset preferences, time of day (coarse), and helped/not-helped **counts** go to MERA's server, which forwards them to the configured Gemma endpoint. **Never** location, journal or voice notes. A note's text is sent for the after-reset summary **only** if you separately allow it. MERA's server doesn't store or log request content. |
+| | What happens |
+| --- | --- |
+| **Local data** | Resets, feelings, outcomes, check-ins, journal text, voice notes and photos live in **IndexedDB in this browser** (Dexie). No account. Preferences live in localStorage. |
+| **Local AI** (Local Gemma) | Mission personalization runs in a Web Worker on this device. Nothing about your resets leaves it. Model files (~784 MB GPU / ~1.7 GB CPU, shown before you agree) are cached in the browser and removable. |
+| **Remote AI** (Connected Gemma, opt-in) | MERA's server receives the tapped feeling, reset settings, coarse time of day and **signal ids**, rebuilds MERA's own prompts, and calls the configured Gemma endpoint (Gemma 4 on Cloudflare Workers AI for the live demo). Never location, journal, voice or photos. A note's text is sent only if you separately allow it. MERA's code doesn't store or log request content. Cloudflare's platform logs record request metadata (path, status, timing), not bodies. |
+| **Offline fallback** | The built-in library, personalized by the same signals with simple rules. No network. |
 
-Controls: export everything (JSON), delete individual journal entries or resets, delete all notes, **delete all data**, turn off AI reflection analysis, reset personalization, remove the downloaded model. No analytics, no trackers, nothing sold.
+The current mode is always visible (`LOCAL AI` · `CONNECTED AI` · `OFFLINE RESET`) on Home, on every mission, and in About.
 
-Voice notes are stored as audio only — **not transcribed**, because in-browser speech recognition would send audio to a third party.
+**Controls (all real, all tested):** Export my data (JSON) · Delete reset history · Delete journal · Delete all local data · Disable AI analysis of notes · Reset personalization · Remove the downloaded model. No analytics, no trackers, nothing sold. Voice notes are stored as audio only and are **not transcribed**.
+
+## How fallback works
+
+Model output → first balanced JSON object → **Zod schema** → **safety rules** (no traffic, strangers, unfamiliar places, night outdoors, strenuous activity, bare feet, tools, medical behaviour, screens or journaling; indoor-only, low-mobility, no-sound and no-smell respected; no clinical, crisis, dependency or hype language) → **personalization check** (cited signals must exist, reason grounded, numbers match). Failure → **one repair retry** → failure again → **library**. Timeouts and network errors go straight to the library. Raw model text is never rendered.
 
 ## Architecture
 
 ```mermaid
 flowchart TD
-  U[User] --> P[MERA PWA]
-  P --> SM[Grounding state machine]
-  SM --> AI[MeraAIProvider]
-  AI --> L[LocalGemmaProvider<br/>Gemma 3 1B in a Web Worker]
-  AI --> R[RemoteGemmaProvider<br/>opt-in, via MERA server]
-  AI --> F[FallbackResetProvider<br/>deterministic library]
-  L --> V{Zod schema +<br/>safety rules}
+  U[GROUND ME] --> SM[Pure state machine<br/>quick or full grounding]
+  SM --> REQ[Mission request<br/>feeling + settings + signal ids]
+  H[(Local history + notes<br/>IndexedDB)] -->|signals, on device| REQ
+  REQ --> L[Local Gemma<br/>Gemma 3 1B, Web Worker]
+  REQ --> R[Connected Gemma<br/>opt-in]
+  REQ --> F[Library fallback<br/>same signals, rules]
+  L --> V{Schema → safety →<br/>personalization check}
   R --> V
-  V -- valid --> M[Validated mission]
+  V -- valid --> M[Mission + Why this reset?]
   V -- invalid twice --> F
   F --> M
-  M --> PD[Phone-down mode]
-  PD --> RF[Return + reflection]
-  RF --> DB[(Local pattern store<br/>IndexedDB)]
-  DB --> AI
-  subgraph Render
-    S[Hono server: PWA + /api/health + /api/config + /api/gemma]
+  M --> PD[Phone-down<br/>timestamp timer]
+  PD --> RT[Return → reflection → time back in the world]
+  RT --> H
+  subgraph Server [Hono API: Cloudflare Workers live · Render Blueprint]
+    S["/api/health · /api/config · /api/gemma (structured tasks only)"]
   end
-  P -. served by .-> S
-  R -. structured tasks only .-> S
+  R -.-> S
 ```
 
-- **State machine** (`src/features/grounding/machine.ts`): a pure, deterministic reducer — `IDLE → INTRO → BODY_AWARENESS → BREATHING → SENSE_5…SENSE_1 → EMOTION_CHECK → MISSION_GENERATION → MISSION_READY → PHONE_DOWN → RETURN → REFLECTION → AI_REFLECTION → COMPLETE`. Persisted, so an accidental refresh (or the OS reclaiming the tab during phone-down) resumes. Exit from any step.
-- **Phone-down timer** uses an absolute end time, so it stays correct across screen lock, backgrounding and refresh.
+- **State machine** (`src/features/grounding/machine.ts`): `INTRO → BODY_AWARENESS → BREATHING → (STEP_AWAY →) SENSE_5…SENSE_1 → EMOTION_CHECK → MISSION_GENERATION → MISSION_READY → PHONE_DOWN → RETURN → REFLECTION → AI_REFLECTION → COMPLETE`, plus `TRY_ANOTHER` after "worse". It's persisted, so a refresh resumes where you were. You can exit from any step.
+- **Phone-down timer:** `startedAt`, `expectedEndAt` and planned duration are stored. Remaining time is computed from timestamps, so screen lock, background throttling and refresh don't skew it. If the timer ends while the screen is off, the gentle cue plays and **the time until you actually come back counts too** (capped at 30 minutes over). Each reset stores `plannedSeconds`, `phoneDownSeconds` (actual), `timerCompleted` and `path`.
+- **Code:** `src/ai` (providers, prompts, schemas, safety, local model) · `src/features/missions` (library, selection, signals) · `server/` (Hono API shared by Node and Workers).
 
 ## Technology stack
 
-React 19 · TypeScript (strict) · Vite 8 · Tailwind CSS v4 · Motion (Framer Motion) · Zod · Zustand · Dexie (IndexedDB) · vite-plugin-pwa (Workbox) · transformers.js + ONNX Runtime Web · Hono on Node (server) · Vitest + React Testing Library + Playwright · ESLint + Prettier.
+React 19 · TypeScript (strict) · Vite 8 · Tailwind CSS v4 · Motion · Zod · Zustand · Dexie · vite-plugin-pwa (Workbox) · transformers.js + ONNX Runtime Web · Hono (Node and Cloudflare Workers) · Vitest + React Testing Library + Playwright + axe-core · ESLint + Prettier.
 
-## AI provider architecture
+Secondary pages are code-split and precached, so Home and the reset flow load first and everything works offline. The local model only downloads after you agree in Settings, then initializes in a Web Worker.
 
-```ts
-interface MeraAIProvider {
-  generateResetMission(req: MissionRequest): Promise<GeneratedMission>;
-  summarizeReflection(facts: ReflectionFacts): Promise<TextResult>;
-  analyzePatterns(facts: PatternFact[]): Promise<PatternResult[]>;
-  generateDailyReset(req: MissionRequest): Promise<GeneratedMission>;
-}
-```
-
-- `LocalGemmaProvider` — Gemma 3 1B instruction-tuned, ONNX 4-bit (`onnx-community/gemma-3-1b-it-ONNX`, pinned revisions), transformers.js in a Web Worker. Downloads in resumable 8 MB chunks (retried, kept in Cache Storage) after a device check (WebGPU, shader-f16, `deviceMemory`, iOS).
-- `RemoteGemmaProvider` — posts `{ task, structured input }` to `/api/gemma`; the server **rebuilds MERA's own prompts** and calls an OpenAI-compatible Gemma endpoint. It is not a general chatbot: free-form prompts are rejected.
-- `FallbackResetProvider` — deterministic library and templates. Always available.
-- Every result carries its **source** (`LOCAL AI` · `CONNECTED AI` · `OFFLINE RESET`), shown in the UI.
-
-**Validation**: model output → first balanced JSON object → Zod schema → safety rules (no traffic, strangers, unfamiliar places, night outdoors, strenuous activity, bare feet, tools, medical behaviour, screens or journaling; indoor-only respected; low mobility respected; no diagnosis, treatment, therapy or crisis claims; no dependency language or hype). Fails → **one repair retry** → fails again → library. Raw model text is never rendered.
-
-## Fallback system
-
-`src/features/missions/library.ts` holds 23 missions across nature, movement, sensory and indoor, tagged by emotion, environment, duration, walking, sound/smell and night-safety. Selection is deterministic (seeded), safe for the person's settings and the time of day, prefers what helped before, avoids repeats, and — Touch Grass — prefers going outside when that's possible. Every library entry passes the same safety rules as AI output (tested).
-
-## Local development
+## How to run it
 
 ```bash
 npm install
-npm run dev          # http://localhost:5173 (PWA)
+npm run dev          # http://localhost:5173
 npm run dev:api      # optional: API on :8787 (Vite proxies /api)
+npm run build && npm start   # production server locally: http://localhost:8787
 ```
 
-Production locally:
+### Environment variables
 
-```bash
-npm run build && npm start   # http://localhost:8787
-```
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `APP_ENV` | `development` | Reported by `/api/health`. |
+| `PORT` | `8787` | Server port (Render sets this). |
+| `ENABLE_LOCAL_AI` | `true` | Advertised in `/api/config`. |
+| `ENABLE_REMOTE_AI` | `false` | Turn on Connected AI. |
+| `MODEL_PROVIDER` | `openai` | `openai` (any OpenAI-compatible endpoint) or `workers-ai`. |
+| `MODEL_ENDPOINT` | — | OpenAI-compatible base URL serving Gemma, e.g. Google AI Studio or Ollama (`http://localhost:11434/v1`). |
+| `MODEL_NAME` | — | e.g. `gemma-3-27b-it`, `gemma3:4b`, or `@cf/google/gemma-4-26b-a4b-it`. |
+| `MODEL_API_KEY` | — | Secret. Server-side only. |
+| `REMOTE_AI_RATE_LIMIT` | `40` | Requests per client per 10 minutes. |
 
-## Environment variables
+## How to deploy it
 
-| Variable               | Default       | Purpose                                                                                                                                  |
-| ---------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `APP_ENV`              | `development` | Reported by `/api/health`.                                                                                                               |
-| `PORT`                 | `8787`        | Server port (Render sets this).                                                                                                          |
-| `MODEL_MODE`           | `local-first` | Documentation of the deployment's intent.                                                                                                |
-| `ENABLE_LOCAL_AI`      | `true`        | Advertised in `/api/config`.                                                                                                             |
-| `ENABLE_REMOTE_AI`     | `false`       | Turn on Connected AI.                                                                                                                    |
-| `MODEL_ENDPOINT`       | —             | OpenAI-compatible base URL serving Gemma, e.g. `https://generativelanguage.googleapis.com/v1beta/openai` or `http://localhost:11434/v1`. |
-| `MODEL_NAME`           | —             | e.g. `gemma-3-27b-it` (Google AI Studio) or `gemma3:4b` (Ollama).                                                                        |
-| `MODEL_API_KEY`        | —             | Secret. Server-side only, never in the frontend bundle.                                                                                  |
-| `REMOTE_AI_RATE_LIMIT` | `40`          | Requests per client per 10 minutes.                                                                                                      |
+### Cloudflare Workers (the live demo)
 
-## Render deployment
-
-MERA ships a **Render Blueprint** (`render.yaml`): one Node web service that builds the PWA and serves it with the small API.
-
-1. Push this repo to GitHub.
-2. In Render: **New → Blueprint**, pick the repo. Render reads `render.yaml`:
-   - build: `npm ci && npm run build` · start: `npm start` · health check: `/api/health`
-3. Optional Connected AI: set `ENABLE_REMOTE_AI=true`, `MODEL_ENDPOINT`, `MODEL_NAME` and the secret `MODEL_API_KEY` in the Render dashboard.
-
-The server sets security headers (CSP, nosniff, frame-ancestors none), caches hashed assets immutably, and falls back to `index.html` for client routes.
-
-## Cloudflare deployment (live)
-
-MERA also runs on **Cloudflare Workers**: https://mera.casmazariegos.workers.dev
-
-- Static PWA via Workers Static Assets (SPA fallback, security headers from `public/_headers`).
-- `/api/*` runs in `server/worker.ts` — the same Hono API as the Render server (`server/api.ts`).
-- Connected AI uses **Gemma 4 26B A4B on Cloudflare Workers AI** through the `AI` binding (no API key in the repo). Still opt-in for visitors.
+https://mera.casmazariegos.workers.dev runs on Workers: the PWA via Static Assets (SPA fallback, security headers from `public/_headers`), and `/api/*` via `server/worker.ts`, which is the same Hono API as the Node server. Connected Gemma is **Gemma 4 26B A4B on Workers AI** through the `AI` binding (no key in the repo).
 
 ```bash
 npm run deploy:cf   # build → drop the unused >25 MiB ORT wasm → wrangler deploy
 ```
 
-Config lives in `wrangler.jsonc` (`MODEL_PROVIDER=workers-ai`, `MODEL_NAME=@cf/google/gemma-4-26b-a4b-it`, `ENABLE_REMOTE_AI=true`).
+### Render
 
-## Accessibility
+MERA ships a **Render Blueprint** (`render.yaml`): one Node web service that builds the PWA and serves it with the API, with `healthCheckPath: /api/health`.
 
-Semantic HTML and headings focused on every scene; keyboard operable, visible focus, Escape exits a reset; the rest of the app is `inert` during a reset; 48 px+ touch targets; WCAG-conscious contrast in light and dark, plus a higher-contrast option; text size options; reduced motion (OS or MERA setting) — breathing is fully conveyed by words and a countdown; sound and haptics optional and always paired with text; colour-independent state (✓ marks, labels); live regions for meaningful changes only.
+1. Push the repo to GitHub.
+2. Render → **New → Blueprint** → pick the repo (build `npm ci && npm run build`, start `npm start`).
+3. Optional Connected AI: set `ENABLE_REMOTE_AI=true`, `MODEL_ENDPOINT`, `MODEL_NAME` and the secret `MODEL_API_KEY`.
 
-## Safety boundaries
+> **Status, stated plainly:** the live demo is currently hosted on Cloudflare Workers, **not** Render. The Render Blueprint is complete and the Node server is what the Playwright suite runs against, but a public Render deployment hasn't been made yet.
 
-MERA is a grounding and wellness tool. It is **not** therapy, a therapist, a diagnosis, a treatment for anxiety, depression or panic, a crisis service, or a replacement for professional care. MERA never diagnoses, never gives medical advice, and its AI output is filtered for clinical language. If you're in danger, contact local emergency services or a crisis line where you live.
+## Demo (for judges, about 1–2 minutes)
+
+Settings → **Set up judge demo**. This turns on Demo mode (clearly labelled: 30-second phone-down, choice to step away after one breath) and adds **sample** resets and two sample notes ("Walking and the cool air helped."), all marked _sample_ and removable in one tap. The AI and everything else is real.
+
+Home → **GROUND ME** → _I'm here_ → feet on the ground → one breath → **I'm ready to step away** → _Overwhelmed_ → a personalized mission → **Why this reset?** → **I'm going** → _Good. Now put me away. Go touch grass._ → 30-second timer → _Welcome back_ → **Better** → optional note → short insight → **"N minutes back in the world"** → _Go live your life._ Then About → **Run a mission request** to see the structured input and output.
+
+## Real-world test
+
+> To be completed with a real reset before submission. Nothing here is invented.
+
+| | |
+| --- | --- |
+| Before | _(feeling)_ |
+| MERA mission | _(mission, source)_ |
+| Off-screen time | _(from the Complete screen)_ |
+| After | _(better / same / worse)_ |
+| Observation | _(the insight MERA showed)_ |
+
+Complete → **Save a summary image** creates a private PNG with only the mission title, time back in the world and the date (no notes or feelings), for documenting it.
 
 ## Testing
 
 ```bash
 npm test            # unit + component + server (Vitest, RTL)
-npm run test:e2e    # Playwright against the production server
+npm run test:e2e    # Playwright against the production Node server, incl. axe
 npm run lint && npm run typecheck
-npm run eval        # real-model mission evaluation (downloads Gemma 3 1B to run on CPU)
+npm run eval        # real-model mission evaluation (downloads Gemma 3 1B, CPU)
 ```
 
-Covered: state transitions, breathing timer, sensory progression, mission schema and safety validation, repair-then-fallback, library safety and selection, reflection wording, pattern grounding, local storage, export and deletion, demo data isolation, server (health, config, structured-only Gemma proxy, security headers, rate limit), accessibility-critical flows, offline use, and the full end-to-end flow.
+**Covered:** state transitions (quick and full paths, step-away, try-another), timestamp timing (end early, return after the timer while the screen was off, cap), breathing and sensory flow, personalization signals (derivation, id validation, reset cutoff, note privacy by mode), history changing the mission (library and prompt), Gemma output checks (invented signals, unfounded or ungrounded reasons, clinical language, empty fields), safety rules, repair-then-fallback, reflection and pattern wording, storage, export and every delete, demo data isolation, and the server (health, config, structured-only Gemma proxy, headers, rate limit).
+
+**End to end:**
+- The full flow, and the quick path to a personalized mission in under 90 s.
+- "Worse" → *Try a different reset*.
+- Phone-down surviving a refresh.
+- Offline use, delete-all, and first-run onboarding.
+- **axe-core (WCAG 2.2 AA) on 14 screens in light and dark.**
+- No horizontal scroll at 320, 360, 375, 390, 414 and 430 px.
 
 ## Measured results
 
-Real Gemma 3 1B (q4, CPU via transformers.js) through MERA's actual prompts, validators and safety rules — a partial run (11 of 18 synthetic cases; the machine ran out of memory): **8 accepted (2 after the one repair retry), 3 fell back to the library, 0 unsafe missions shown**. Two of the fallbacks came from MERA's own schema rejecting an empty optional field, which is now fixed but not yet re-measured. Details and the per-case table: [docs/EVALUATION.md](docs/EVALUATION.md).
+The earlier run used real Gemma 3 1B (q4, CPU via transformers.js) through MERA's actual prompts, validators and safety rules. It was partial, covering 11 of 18 synthetic cases before the machine ran out of memory: **8 accepted (2 after the one repair retry), 3 fell back to the library, 0 unsafe missions shown.** That predates the personalization prompt and hasn't been re-measured yet. Details: [docs/EVALUATION.md](docs/EVALUATION.md).
 
-## Demo
+## Accessibility
 
-Settings → **Demo mode**: 30-second phone-down and a single breath, clearly labelled. **Add sample history** fills My Patterns with resets marked _sample_ (removable in one tap). Everything else is real.
+- **Structure and keyboard:** semantic headings focused on every scene, fully keyboard-operable, visible focus, Escape exits a reset, and the rest of the app is `inert` during one.
+- **Touch and contrast:** 44–56 px touch targets; WCAG AA contrast in light and dark (axe-verified), plus a higher-contrast option and text-size options.
+- **Motion and senses:** reduced motion (OS or MERA setting); breathing is fully conveyed by words and a countdown; sound and haptics are optional and always paired with text.
+- **Timer:** a `role="timer"` that updates once a minute (no chatter).
+- **Colour:** state never depends on colour alone.
 
-Judge walkthrough: Home → GROUND ME → breathe → 5-4-3-2-1 → feeling → mission (source shown) → "Now put me away" → phone-down → End early → Welcome back → reflection → Reset complete → My Patterns → Privacy & AI.
+## Safety boundaries
+
+MERA is a grounding and wellness tool. It is **not** therapy, a diagnosis, a treatment, or a crisis service, and it doesn't replace professional care. It never diagnoses, never gives medical advice, and filters AI output for clinical language. Pattern insights are observations ("seems", "has helped"), never conclusions. If you're in danger, contact local emergency services or a crisis line where you live.
 
 ## Roadmap
 
-- MERA-tuned Gemma (Tinker) evaluated against the base model with `npm run eval`.
-- On-device speech-to-text for voice reflections (open model, no third-party audio).
-- Smaller on-device model option for phones.
-- Optional reminders for Daily Reset that respect quiet hours (no streaks).
+- Re-run `npm run eval` on the personalization prompt; then a MERA-tuned Gemma (Tinker), measured against the base.
+- On-device speech-to-text for voice notes (open model, no third-party audio).
+- A smaller on-device model option for phones.
 
 ## Contributing
 
@@ -249,5 +282,5 @@ Issues and PRs welcome. Before adding a feature, ask: _does this help someone re
 ## Credits
 
 - MERA by **Cass - NextRealm Interactive**, part of the Meep universe.
-- The resumable model download and device-capability check are adapted from the author's own MIT-licensed [Meeply](https://github.com/CasMazariegos/meeply).
-- Gemma by Google DeepMind · transformers.js and ONNX community models by Hugging Face · Figtree and Fraunces fonts (SIL OFL).
+- The resumable model download and device check are adapted from the author's MIT-licensed [Meeply](https://github.com/CasMazariegos/meeply).
+- Gemma by Google DeepMind · transformers.js and ONNX community models by Hugging Face · Figtree and Fraunces (SIL OFL).

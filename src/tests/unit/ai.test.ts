@@ -19,6 +19,7 @@ const req: MissionRequest = {
   helped: { nature: 2, movement: 0, sensory: 0, indoor: 0 },
   notHelped: { nature: 0, movement: 1, sensory: 0, indoor: 0 },
   recentTitles: [],
+  signals: [],
 };
 
 const good = JSON.stringify({

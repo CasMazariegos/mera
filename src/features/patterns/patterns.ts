@@ -3,6 +3,20 @@
  * may only rephrase a fact, and any number it uses must be one computed here.
  * Framed as observations ("seems", "has helped"), never conclusions.
  */
+import { missionActivities, personalSignals, type Activity } from "@/features/missions/signals";
+
+const ACTIVITY_PHRASE: Record<Activity, string> = {
+  walking: "Walking",
+  sound: "Listening for sounds",
+  sky: "Looking at the sky",
+  plants: "Time near plants or trees",
+  touch: "Touch and texture",
+  fresh_air: "Fresh air",
+  water: "Water",
+  light: "Light",
+  stretch: "Gentle stretching",
+  breath: "Slow breathing",
+};
 import type { PatternFact } from "@/ai/prompts/prompts";
 import type { MissionRequest } from "@/ai/schemas/mission";
 import { CATEGORIES, EMOTION_LABEL, type MissionCategory, type Preferences, type ResetRecord } from "@/types";
@@ -41,8 +55,18 @@ export function categoryOutcomes(history: ResetRecord[], last = 20) {
   return { helped, notHelped };
 }
 
-export function buildMissionRequest(input: { emotion: MissionRequest["emotion"]; prefs: Preferences; history: ResetRecord[]; now: Date }): MissionRequest {
-  const { helped, notHelped } = categoryOutcomes(input.history);
+export function buildMissionRequest(input: {
+  emotion: MissionRequest["emotion"];
+  prefs: Preferences;
+  history: ResetRecord[];
+  now: Date;
+  /** The person's own notes (newest first). Only matched locally into theme ids. */
+  notes?: Array<{ text: string; at: number }>;
+  /** "Reset personalization": ignore history from before this time. */
+  since?: number;
+}): MissionRequest {
+  const history = input.since ? input.history.filter((r) => r.startedAt >= input.since!) : input.history;
+  const { helped, notHelped } = categoryOutcomes(history);
   return {
     emotion: input.emotion,
     canGoOutside: input.prefs.canGoOutside,
@@ -53,11 +77,31 @@ export function buildMissionRequest(input: { emotion: MissionRequest["emotion"];
     timeOfDay: timeOfDay(input.now.getHours()),
     helped,
     notHelped,
-    recentTitles: input.history
+    recentTitles: history
       .map((r) => r.mission?.title)
       .filter((t): t is string => !!t)
       .slice(0, 3),
+    signals: compatibleSignals(
+      personalSignals({
+        history,
+        emotion: input.emotion,
+        notes: (input.notes ?? []).filter((n) => !input.since || n.at >= input.since).map((n) => n.text),
+      }),
+      input.prefs,
+    ),
   };
+}
+
+/** Settings win over history: never nudge toward something the person has ruled out (e.g. walking with low mobility). */
+export function compatibleSignals(ids: string[], prefs: Preferences): string[] {
+  return ids.filter((id) => {
+    const [kind, a, b] = id.split(":");
+    const cat = kind === "feeling_helped" ? b : kind === "cat_helped" || kind === "cat_not_helped" ? a : null;
+    const act = kind === "act_helped" || kind === "note_theme" ? a : null;
+    if (prefs.lowMobility && (cat === "movement" || act === "walking" || act === "stretch")) return false;
+    if (prefs.avoidSound && act === "sound") return false;
+    return true;
+  });
 }
 
 /** Observations worth showing. Empty until there's enough history to say anything honest. */
@@ -79,6 +123,25 @@ export function detectPatterns(history: ResetRecord[]): PatternFact[] {
       key: `best-${best.c}`,
       sentence: `${CATEGORY_WORD[best.c]} have helped in ${best.better} of your last ${best.total} tries.`,
       numbers: [best.better, best.total],
+    });
+  }
+
+  // 1b. An activity (walking, listening…) that keeps showing up in resets that helped.
+  const acts = new Map<Activity, { better: number; total: number }>();
+  for (const r of recent)
+    for (const a of missionActivities(r.mission!)) {
+      const x = acts.get(a) ?? { better: 0, total: 0 };
+      x.total++;
+      if (r.outcome === "better") x.better++;
+      acts.set(a, x);
+    }
+  const topAct = [...acts.entries()].filter(([, x]) => x.total >= 2 && x.better * 2 > x.total).sort((p, q) => q[1].better - p[1].better)[0];
+  if (topAct) {
+    const [a, x] = topAct;
+    facts.push({
+      key: `best-act-${a}`,
+      sentence: `${ACTIVITY_PHRASE[a]} helped in ${x.better} of the ${x.total} recent resets that included it.`,
+      numbers: [x.better, x.total],
     });
   }
 
@@ -121,10 +184,6 @@ export function detectPatterns(history: ResetRecord[]): PatternFact[] {
     });
   }
 
-  // 5. Time away from the screen.
-  const minutes = Math.round(done.reduce((n, r) => n + r.phoneDownSeconds, 0) / 60);
-  if (minutes >= 5) facts.push({ key: "minutes-away", sentence: `You've spent ${minutes} minutes away from the screen with MERA.`, numbers: [minutes] });
-
   return facts;
 }
 
@@ -134,6 +193,15 @@ export function thisWeek(history: ResetRecord[], now = new Date()): number {
   start.setHours(0, 0, 0, 0);
   start.setDate(start.getDate() - ((start.getDay() + 6) % 7)); // Monday
   return history.filter((r) => r.completedAt && r.completedAt >= start.getTime()).length;
+}
+
+/** Minutes back in the world since Monday: the quiet number MERA cares about. */
+export function minutesThisWeek(history: ResetRecord[], now = new Date()): number {
+  const start = new Date(now);
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+  const secs = history.filter((r) => r.completedAt && r.completedAt >= start.getTime()).reduce((n, r) => n + (r.phoneDownSeconds || 0), 0);
+  return Math.round(secs / 60);
 }
 
 /** "one", "two", … for small numbers (copy reads better). */

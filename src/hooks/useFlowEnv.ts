@@ -17,6 +17,6 @@ export function useFlowEnv() {
     cues,
     demo: settings.demo,
     /** Demo mode shortens waits for presentations; real use keeps full timing. */
-    timing: settings.demo ? { bodySeconds: 4, breathCycles: 1, phoneDownMs: 30_000 } : { bodySeconds: 9, breathCycles: 3, phoneDownMs: null as number | null },
+    timing: settings.demo ? { bodySeconds: 4, breathCycles: 2, phoneDownMs: 30_000 } : { bodySeconds: 9, breathCycles: 3, phoneDownMs: null as number | null },
   };
 }

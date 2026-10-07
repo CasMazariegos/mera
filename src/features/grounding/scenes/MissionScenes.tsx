@@ -2,19 +2,19 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { MeraCharacter } from "@/components/MeraCharacter";
-import { Button, Eyebrow } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { useFlow } from "@/store/flow";
 import { useSettings } from "@/store/settings";
 import { useFlowEnv } from "@/hooks/useFlowEnv";
 import { meraAI } from "@/ai";
 import { statusLabel } from "@/ai/mera-ai";
-import { buildMissionRequest } from "@/features/patterns/patterns";
-import { completedResets } from "@/data/db";
+import { missionRequestFor } from "@/features/missions/request";
 import { cue } from "@/lib/cues";
 import { setBeforePhoto } from "@/store/photos";
 import type { GeneratedMission } from "@/types";
 import { CATEGORY_ICON, CATEGORY_LABEL, CATEGORY_TINT, ENVIRONMENT_ICON, ENVIRONMENT_LABEL, Sparkles } from "@/components/icons";
 import { ProgressRing } from "@/components/Scenery";
+import { WhyThisReset } from "@/components/WhyThisReset";
 import { Scene } from "../Scene";
 
 const SOURCE_NOTE: Record<GeneratedMission["source"], string> = {
@@ -36,13 +36,7 @@ export function MissionGenerationScene() {
     started.current = true;
     const t0 = Date.now();
     void (async () => {
-      const history = await completedResets(50).catch(() => []);
-      const req = buildMissionRequest({
-        emotion: flow.emotion ?? "not_sure",
-        prefs: { ...prefs, canGoOutside: outside ? "yes" : "indoor_only" },
-        history,
-        now: new Date(),
-      });
+      const req = await missionRequestFor(flow.emotion ?? "not_sure", { ...prefs, canGoOutside: outside ? "yes" : "indoor_only" });
       // "Something else": don't hand back the one just shown.
       if (flow.mission) req.recentTitles = [flow.mission.title, ...req.recentTitles].slice(0, 5);
       const mission = await meraAI.generateResetMission(req);
@@ -115,7 +109,7 @@ export function MissionReadyScene() {
             {/* Ticket header: the kind of reset, as a small window of colour. */}
             <div className="flex items-center justify-between px-6 pt-6 pb-5" style={{ background: CATEGORY_TINT[mission.category] }}>
               <div>
-                <Eyebrow>Your reset</Eyebrow>
+                <p className="text-micro font-semibold tracking-[0.14em] text-ink-2 uppercase">Your reset</p>
                 <p className="mt-1 inline-flex items-center gap-1.5 text-small font-semibold text-ink">
                   <CatIcon aria-hidden className="size-4" strokeWidth={1.75} /> {CATEGORY_LABEL[mission.category]}
                 </p>
@@ -171,6 +165,7 @@ export function MissionReadyScene() {
         <Sparkles aria-hidden className="size-3.5" />
         {SOURCE_NOTE[mission.source]} · {statusLabel(mission.source === "library" ? "fallback" : mission.source)}
       </p>
+      <WhyThisReset mission={mission} className="mt-1" />
       <button type="button" className="mt-2 min-h-11 text-micro text-muted underline underline-offset-4" onClick={() => fileRef.current?.click()}>
         {photo ? "Before photo saved on this device" : "Optional: take a “before” photo"}
       </button>
@@ -230,10 +225,17 @@ export function PhoneDownScene() {
     };
   }, []);
 
+  // Time's up: a gentle cue, then wait for the person to actually come back to the screen.
+  // If they're still away (screen off / app in background), that time counts too.
+  const cued = useRef(false);
   useEffect(() => {
-    if (now >= endsAt && !fired.current) {
-      fired.current = true;
+    if (now < endsAt) return;
+    if (!cued.current) {
+      cued.current = true;
       cue.timerDone(cues);
+    }
+    if (!fired.current && document.visibilityState !== "hidden") {
+      fired.current = true;
       send({ type: "PHONE_DOWN_FINISHED", now: Date.now() });
     }
   }, [now, endsAt, cues, send]);
@@ -293,10 +295,16 @@ export function PhoneDownScene() {
       data-testid="phone-down"
     >
       <h1 id="pd-title" className="sr-only">
-        Phone down. {mmss(left)} left. You don’t need to look at me.
+        Phone down. You don’t need to look at me.
       </h1>
+      {/* Minute-level updates only, so a screen reader isn't chattering every second. */}
+      <p role="timer" className="sr-only">
+        {left <= 0
+          ? "Time’s up. Come back whenever you’re ready."
+          : `About ${Math.max(1, Math.ceil(left / 60_000))} minute${Math.ceil(left / 60_000) > 1 ? "s" : ""} left.`}
+      </p>
       <div aria-hidden className="flex flex-col items-center">
-        <ProgressRing value={1 - Math.max(0, left) / Math.max(1, endsAt - startedAt)} size={270} stroke={2}>
+        <ProgressRing value={1 - Math.max(0, left) / Math.max(1, endsAt - startedAt)} size={270} stroke={1.5}>
           <div className="flex flex-col items-center">
             <p className="font-display text-[4.25rem] leading-none font-light text-ink-2 tabular" data-testid="countdown">
               {mmss(left)}
@@ -312,6 +320,7 @@ export function PhoneDownScene() {
         <button
           type="button"
           aria-pressed={settings.sound}
+          aria-label="Sound cue when time’s up"
           onClick={() => settings.set({ sound: !settings.sound })}
           className="min-h-11 rounded-full px-4 text-muted hover:text-ink"
         >
@@ -320,6 +329,7 @@ export function PhoneDownScene() {
         <button
           type="button"
           aria-pressed={settings.haptics}
+          aria-label="Vibration when time’s up"
           onClick={() => settings.set({ haptics: !settings.haptics })}
           className="min-h-11 rounded-full px-4 text-muted hover:text-ink"
         >

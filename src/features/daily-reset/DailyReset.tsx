@@ -1,4 +1,5 @@
 /** Daily Reset: one small proactive thing, before overwhelm. No streaks. */
+import { missionRequestFor } from "@/features/missions/request";
 import { Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button, Page } from "@/components/ui";
@@ -6,7 +7,7 @@ import { meraAI } from "@/ai";
 import { useSettings } from "@/store/settings";
 import { useFlow } from "@/store/flow";
 import { completedResets, newId } from "@/data/db";
-import { buildMissionRequest, countWord, thisWeek } from "@/features/patterns/patterns";
+import { countWord, thisWeek } from "@/features/patterns/patterns";
 import type { GeneratedMission } from "@/types";
 
 export function DailyReset() {
@@ -20,12 +21,7 @@ export function DailyReset() {
     void (async () => {
       const history = await completedResets(50);
       if (live) setWeek(thisWeek(history));
-      const req = buildMissionRequest({
-        emotion: "not_sure",
-        prefs: { ...prefs, canGoOutside: prefs.canGoOutside === "ask_each_time" ? "yes" : prefs.canGoOutside },
-        history,
-        now: new Date(),
-      });
+      const req = await missionRequestFor("not_sure", { ...prefs, canGoOutside: prefs.canGoOutside === "ask_each_time" ? "yes" : prefs.canGoOutside });
       const m = await meraAI.generateDailyReset(req);
       if (live) setMission(m);
     })();

@@ -53,6 +53,22 @@ export async function deleteAllData() {
   });
 }
 
+/** Reset history only (journal notes stay, unlinked). */
+export async function deleteResetHistory() {
+  await db.resets.clear();
+}
+
+/** Journal only: notes, voice notes and photos. */
+export async function deleteJournal() {
+  await db.journal.clear();
+  await db.resets
+    .where("id")
+    .above("")
+    .modify((r) => {
+      delete r.reflectionId;
+    });
+}
+
 /** Remove only the clearly-labelled sample data added by demo mode. */
 export async function deleteDemoData() {
   await db.resets.filter((r) => !!r.demo).delete();
@@ -80,4 +96,13 @@ export async function exportAll(): Promise<Blob> {
   );
   const payload = { app: "MERA", version: 1, exportedAt: new Date().toISOString(), resets, journal: entries, checkins };
   return new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+}
+
+/** Recent typed notes, newest first, for on-device theme matching ("fresh air", "walking"…). */
+export async function recentNotes(limit = 10): Promise<Array<{ text: string; at: number }>> {
+  const rows = await db.journal.orderBy("createdAt").reverse().limit(40).toArray();
+  return rows
+    .filter((e) => e.text && e.text.trim())
+    .slice(0, limit)
+    .map((e) => ({ text: e.text!, at: e.createdAt }));
 }

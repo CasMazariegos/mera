@@ -19,8 +19,9 @@ test("HOME → GROUND ME → reset → mission → phone down → return → ref
   await expect(page.getByRole("heading", { name: "Put both feet on the ground." })).toBeVisible();
   await page.getByTestId("continue").click();
   await expect(page.getByTestId("breath-phase")).toHaveText(/Breathe in|Hold|Breathe out/);
-  // Demo mode: one full breath (12 s), then it moves on by itself.
-  await expect(page.getByRole("heading", { name: /Notice five things you can see/ })).toBeVisible({ timeout: 20_000 });
+  // After one breath MERA offers to step away; doing nothing keeps grounding (demo: two breaths, 24 s).
+  await expect(page.getByTestId("step-away")).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole("heading", { name: /Notice five things you can see/ })).toBeVisible({ timeout: 30_000 });
   for (const cta of ["I see them", "I feel them", "I hear them", "Done", "I have one"]) await page.getByRole("button", { name: cta }).click();
   await page.getByTestId("emotion-overwhelmed").click();
   await expect(page.getByTestId("mission-title")).toBeVisible();
@@ -36,6 +37,7 @@ test("HOME → GROUND ME → reset → mission → phone down → return → ref
   await page.getByTestId("save-note").click();
   await expect(page.getByTestId("recap")).toContainText("Overwhelmed");
   await expect(page.getByTestId("recap")).toContainText("Better");
+  await expect(page.getByTestId("back-in-world")).toContainText("back in the world");
   await expect(page.getByTestId("insight")).toBeVisible();
   await expect(page.getByText("Go live your life.")).toBeVisible();
   await page.getByTestId("done").click();
@@ -44,6 +46,54 @@ test("HOME → GROUND ME → reset → mission → phone down → return → ref
   // The note is in the journal, on this device.
   await page.goto("/#/journal");
   await expect(page.getByText("The cold air helped.")).toBeVisible();
+});
+
+test("quick path: one breath, then 'I'm ready to step away' reaches a personalized mission fast", async ({ page }) => {
+  // Clearly labelled sample history (two walks that helped, with notes), as a judge would set it up.
+  await page.goto("/#/settings");
+  await page.getByTestId("judge-demo").click();
+  await expect(page.getByRole("button", { name: "GROUND ME" })).toBeVisible();
+  const t0 = Date.now();
+  await page.getByRole("button", { name: "GROUND ME" }).click();
+  await page.getByTestId("start-reset").click();
+  await page.getByTestId("continue").click();
+  await page.getByTestId("step-away").click({ timeout: 15_000 });
+  await page.getByTestId("emotion-overstimulated").click();
+  await expect(page.getByTestId("mission-title")).toBeVisible();
+  expect(Date.now() - t0).toBeLessThan(90_000);
+  // "Why this reset?" is closed until asked, then shows the person's own history behind it.
+  await expect(page.getByTestId("why-reason")).toBeHidden();
+  await page.getByText("Why this reset?").click();
+  await expect(page.getByTestId("why-reason")).toContainText("helped");
+  await expect(page.getByTestId("why-this-reset")).toContainText("Nothing left this device.");
+});
+
+test("after 'Worse': no fake positivity, and a different reset is one tap away", async ({ page }) => {
+  await page.getByRole("button", { name: "GROUND ME" }).click();
+  await page.getByTestId("start-reset").click();
+  await page.getByTestId("continue").click();
+  await page.getByTestId("step-away").click({ timeout: 15_000 });
+  await page.getByTestId("emotion-anxious").click();
+  const first = await page.getByTestId("mission-title").textContent();
+  await page.getByTestId("im-going").click();
+  await page.getByTestId("end-early").click({ timeout: 10_000 });
+  await page.getByTestId("outcome-worse").click();
+  await expect(page.getByRole("heading", { name: "Thanks for checking back in." })).toBeVisible();
+  await page.getByTestId("try-another").click();
+  await expect(page.getByTestId("mission-title")).toBeVisible();
+  expect(await page.getByTestId("mission-title").textContent()).not.toBe(first);
+});
+
+test("phone-down survives a refresh (timer from timestamps)", async ({ page }) => {
+  await page.goto("/#/daily");
+  await page.getByTestId("daily-go").click();
+  await page.getByTestId("im-going").click();
+  await expect(page.getByTestId("countdown")).toBeVisible({ timeout: 10_000 });
+  await page.reload();
+  await expect(page.getByTestId("countdown")).toBeVisible();
+  await expect(page.getByText("Now put me away.")).toBeHidden();
+  await page.getByTestId("end-early").click();
+  await expect(page.getByRole("heading", { name: "Welcome back." })).toBeVisible();
 });
 
 test("works offline once loaded (app shell + reset library)", async ({ page, context }) => {

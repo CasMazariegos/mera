@@ -17,6 +17,7 @@ const base: MissionRequest = {
   helped: { nature: 0, movement: 0, sensory: 0, indoor: 0 },
   notHelped: { nature: 0, movement: 0, sensory: 0, indoor: 0 },
   recentTitles: [],
+  signals: [],
 };
 
 describe("breathing timer (in 4, hold 2, out 6, ×3)", () => {

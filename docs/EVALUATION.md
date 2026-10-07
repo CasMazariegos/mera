@@ -53,3 +53,23 @@ MERA-tuned model should diversify. This is the baseline for `src/ai/tuning`.
 npm run eval                     # all 18 cases; needs ~2 GB free RAM and ~1.7 GB model download on first run
 cat src/ai/evaluation/last-run.json
 ```
+
+## Live personalization check (2026-10-06)
+
+`npx tsx --tsconfig tsconfig.app.json scripts/live-gemma-check.ts` runs MERA's real `GemmaProvider` (prompt → model → schema → safety → personalization check → one repair) against the live deployment's Connected Gemma (**Gemma 4 26B A4B on Cloudflare Workers AI**).
+
+| Case | Signals sent | Result | Mission | Why (cited) |
+| --- | --- | --- | --- | --- |
+| No history | none | ✓ accepted | Soft Evening Sounds (sensory) | none, correctly |
+| Walks helped + note "walking and the cool air helped" | `cat_helped:movement:2:2`, `act_helped:walking:2`, `note_theme:walking`, `note_theme:fresh_air` | ✓ | Cool Air Walk (movement, outdoor) | all four |
+| Same history, now anxious | same | ✓ | Cool Air Walk | all four |
+| Same history, indoor only | + `feeling_helped:overwhelmed:movement` | ✓ | Slow Hallway Walk (indoor) | four of five |
+| Same history, low mobility | none (walking/movement dropped by settings) | ✓ | Texture of Nature (seated, sensory) | none, correctly |
+
+**5 of 5 accepted, 0 unsafe, history changed the mission in every case where it existed, and the reason only cited ids the model was given.**
+
+What earlier runs of this check caught, now fixed:
+- Sending walking signals with low mobility made Gemma suggest walking; the safety rule rejected it twice. Signals that conflict with settings are now filtered out first.
+- With no history, Gemma copied the worked example's signal id. The prompt now says "nothing yet" explicitly, and invented ids are dropped, never trusted.
+
+This is a small, synthetic check of the personalization path. It's not a substitute for re-running the full `npm run eval` on the new prompt.
