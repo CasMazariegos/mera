@@ -222,8 +222,9 @@ export function AboutPage() {
 
       <Block title="Where MERA runs">
         <p>
-          The live demo runs on Cloudflare Workers, with Connected Gemma on Workers AI. MERA also ships a Render Blueprint (<code>render.yaml</code>) with a
-          health check, so the same app and API can be deployed on Render as a Node web service.
+          MERA is deployed on <strong className="font-semibold">Render</strong> as a Node web service from its Blueprint (<code>render.yaml</code>): the app,
+          the offline service worker and the small API, with a health check and auto-deploy from GitHub. A mirror on Cloudflare Workers runs Connected Gemma on
+          Workers AI. Both use the same code. Local Gemma and the offline library work on either.
         </p>
       </Block>
 

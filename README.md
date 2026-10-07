@@ -11,7 +11,7 @@ When everything feels like too much, press **GROUND ME**. MERA helps you pause, 
 > MERA uses AI to shorten the digital experience, not extend it.
 > **MERA is designed to help you leave MERA.**
 
-**Live:** https://mera.casmazariegos.workers.dev · Built for **Hacktoberfest 2026, Week 1: Touch Grass** · Targets: _Best Use of Gemma_, _Best Use of Render_
+**Live on Render:** https://mera-6cer.onrender.com · **Mirror with Connected Gemma (Cloudflare):** https://mera.casmazariegos.workers.dev · Built for **Hacktoberfest 2026, Week 1: Touch Grass** · Targets: _Best Use of Gemma_, _Best Use of Render_
 
 <p>
   <img src="docs/screenshots/light-01-home.png" width="190" alt="MERA home: Come back to yourself, and the GROUND ME button" />
@@ -192,7 +192,7 @@ flowchart TD
   M --> PD[Phone-down<br/>timestamp timer]
   PD --> RT[Return → reflection → time back in the world]
   RT --> H
-  subgraph Server [Hono API: Cloudflare Workers live · Render Blueprint]
+  subgraph Server [One Hono API: Render (Node) · Cloudflare Workers]
     S["/api/health · /api/config · /api/gemma (structured tasks only)"]
   end
   R -.-> S
@@ -233,23 +233,27 @@ npm run build && npm start   # production server locally: http://localhost:8787
 
 ## Deployment
 
-### Cloudflare Workers (the live demo)
+MERA runs from one codebase in two places. The Hono API in `server/api.ts` is shared by the Node server (`server/index.ts`) and the Worker (`server/worker.ts`).
 
-https://mera.casmazariegos.workers.dev runs on Workers: the PWA via Static Assets (SPA fallback, security headers from `public/_headers`), and `/api/*` via `server/worker.ts`, which is the same Hono API as the Node server. Connected Gemma is **Gemma 4 26B A4B on Workers AI** through the `AI` binding (no key in the repo).
+### Render (live): https://mera-6cer.onrender.com
+
+Deployed with the **Render Blueprint** in `render.yaml`: one Node web service that builds the PWA and serves it with the API.
+
+- **Build** `npm ci && npm run build` (typecheck + Vite + service worker) · **Start** `npm start` · **Health check** `/api/health` · **Auto-deploy** on every push to `master` of the GitHub repo.
+- Serves the installable app, offline service worker, security headers (CSP, nosniff, no-referrer, frame-ancestors none), and `/api/health`, `/api/config`, `/api/gemma`.
+- **Verified:** the full Playwright suite runs against the live Render URL: `E2E_BASE_URL=https://mera-6cer.onrender.com npx playwright test tests/e2e/ground-me.spec.ts` (9 of 9 passing on 2026-10-07: full and quick paths, "Worse" → try another, refresh during phone-down, timer ending while the screen is off, offline, delete-all, first visit).
+- **AI on Render:** Local Gemma (in the visitor's browser) and the offline library work as-is. Connected Gemma is off until an endpoint is configured. Set `ENABLE_REMOTE_AI=true`, `MODEL_ENDPOINT`, `MODEL_NAME` and the secret `MODEL_API_KEY` in the Render dashboard (e.g. Google AI Studio's OpenAI-compatible endpoint with a Gemma model).
+- On Render's free plan the service sleeps when idle, so the first request after a while takes up to about a minute.
+
+To deploy your own: fork → Render **New → Blueprint** → pick the repo → **Apply**.
+
+### Cloudflare Workers (mirror with Connected Gemma): https://mera.casmazariegos.workers.dev
+
+The PWA via Workers Static Assets (SPA fallback, headers from `public/_headers`), and `/api/*` via `server/worker.ts`. Connected Gemma here is **Gemma 4 26B A4B on Workers AI** through the `AI` binding (no key in the repo). This is where the live Gemma results in this README were captured.
 
 ```bash
 npm run deploy:cf   # build → drop the unused >25 MiB ORT wasm → wrangler deploy
 ```
-
-### Render
-
-MERA ships a **Render Blueprint** (`render.yaml`): one Node web service that builds the PWA and serves it with the API, with `healthCheckPath: /api/health`.
-
-1. Push the repo to GitHub.
-2. Render → **New → Blueprint** → pick the repo (build `npm ci && npm run build`, start `npm start`).
-3. Optional Connected AI: set `ENABLE_REMOTE_AI=true`, `MODEL_ENDPOINT`, `MODEL_NAME` and the secret `MODEL_API_KEY`.
-
-> **Status, stated plainly:** the live demo is currently hosted on Cloudflare Workers, **not** Render. The Render Blueprint is complete and the Node server is what the Playwright suite runs against, but a public Render deployment hasn't been made yet.
 
 ## Accessibility
 
