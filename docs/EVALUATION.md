@@ -73,3 +73,7 @@ What earlier runs of this check caught, now fixed:
 - With no history, Gemma copied the worked example's signal id. The prompt now says "nothing yet" explicitly, and invented ids are dropped, never trusted.
 
 This is a small, synthetic check of the personalization path. It's not a substitute for re-running the full `npm run eval` on the new prompt.
+
+### Judge-demo scenario (2026-10-07)
+
+The sample history's 5 signals with feeling _Overstimulated_: 3 of 3 runs accepted. Each returned "Slow Walk and Listen" (walk slowly, notice your feet, listen for the furthest sound), with the reason "Movement, walking, and sensory-based resets have helped in the past." and all 5 signals cited. Before the fix, all 3 runs fell back to the library because the output schema capped cited signals at 4.

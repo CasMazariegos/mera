@@ -1,8 +1,12 @@
 /** GROUND ME — the most important control in MERA. One tap from anywhere. */
 import { useGroundMe } from "@/hooks/useGroundMe";
 
-export function GroundMeButton() {
-  const start = useGroundMe();
+export function GroundMeButton({ onPress }: { onPress?: () => void } = {}) {
+  const ground = useGroundMe();
+  const start = () => {
+    onPress?.();
+    ground();
+  };
   return (
     <div className="relative mx-auto w-full max-w-sm">
       {/* Two slow halos, breathing out from the button. */}

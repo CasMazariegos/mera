@@ -161,8 +161,11 @@ test.describe("first visit", () => {
     expect(saved).toMatchObject({ onboarded: true, canGoOutside: "indoor_only", usualMinutes: 2, aiMode: "off" });
   });
 
-  test("GROUND ME is still one tap away on the welcome page", async ({ page }) => {
-    await page.getByRole("button", { name: "I need it right now" }).click();
+  test("the first thing a newcomer sees is GROUND ME, and trying it lands them on Home after", async ({ page }) => {
+    await expect(page.getByRole("heading", { level: 1, name: "Come back to yourself." })).toBeVisible();
+    await page.getByRole("button", { name: "GROUND ME" }).click();
     await expect(page.getByRole("heading", { name: "I’m here." })).toBeVisible();
+    await page.getByTestId("exit-flow").click();
+    await expect(page.getByTestId("ai-status")).toBeVisible(); // Home, not the welcome page again
   });
 });

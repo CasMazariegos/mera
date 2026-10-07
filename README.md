@@ -22,7 +22,7 @@ When everything feels like too much, press **GROUND ME**. MERA helps you pause, 
 
 ---
 
-## What MERA is
+## Overview
 
 A mobile-first, installable web app (PWA). One button starts a short grounding sequence. As soon as you're ready, MERA hands you **one** small real-world mission, chosen by **Gemma** from what has actually helped _you_ before. Then: _"Good. Now put me away. Go touch grass. I'll be here when you get back."_ A nearly empty timer screen waits while you're gone. When you come back, one tap says how it went, and MERA shows how long you were **back in the world**.
 
@@ -32,6 +32,31 @@ CHAOS → "I'm here." → ground → breathe → "I'm ready to step away"
       → REAL WORLD, phone down → "Welcome back." → better / same / worse
       → optional note → one short insight → "6 minutes back in the world." → "Go live your life."
 ```
+
+## Why MERA exists
+
+Most wellness apps still ask you to stare at your phone: feeds, streaks, long chats, content libraries. When you're overwhelmed, more screen is the last thing you need. MERA does the opposite: the outside world is supposed to win, and MERA's best outcome is that you close it.
+
+## Touch Grass challenge
+
+| The challenge asks for… | MERA |
+| --- | --- |
+| Open-weight AI at the core | Gemma personalizes each real-world mission from your own history and explains why ("Walking was part of 4 resets that helped"). |
+| Getting people off the screen | Every reset ends in **phone-down mode**. Time away is measured from timestamps and is the product's main metric. |
+| Why open matters | Feelings and notes are some of the most personal things people write. Gemma can run **in your browser**, so they don't have to leave the device. |
+
+## The anti-engagement design
+
+Most apps measure success by how long you stay. **MERA measures how quickly it can help you leave.**
+
+- **The AI is intentionally brief.** Gemma returns one mission in strict JSON, plus a one-line reason. No chat.
+- **The quick path is under 90 seconds.** After one breath MERA offers _"I'm ready to step away"_. Keep grounding if you want, never because you have to.
+- **The phone-down screen is intentionally boring.** A timer, a tiny resting MERA, _Audio · Haptics · End early_. Nothing to read.
+- **The one number MERA shows is time away.** _"6 minutes back in the world."_ Not XP, points, streaks or badges. No comparisons, no shaming.
+- **The quieter you need it, the quieter MERA gets.** The character barely moves while you ground, almost disappears in phone-down mode, and only softly reappears when you return.
+- **No** feeds, notifications, streaks, achievements, social features, articles or chatbots.
+
+The most important part of MERA happens away from MERA.
 
 ## Ground Me flow
 
@@ -50,31 +75,6 @@ CHAOS → "I'm here." → ground → breathe → "I'm ready to step away"
 | 11 | Complete | **Reset complete · 6 minutes back in the world**, one short insight, _"Go live your life."_ Done. |
 
 Quick path: about 30–60 s to the mission (one breath). Full path: about 2–3 minutes.
-
-## Why it exists
-
-Most wellness apps still ask you to stare at your phone: feeds, streaks, long chats, content libraries. When you're overwhelmed, more screen is the last thing you need. MERA does the opposite: the outside world is supposed to win, and MERA's best outcome is that you close it.
-
-## The anti-engagement design
-
-Most apps measure success by how long you stay. **MERA measures how quickly it can help you leave.**
-
-- **The AI is intentionally brief.** Gemma returns one mission in strict JSON, plus a one-line reason. No chat.
-- **The quick path is under 90 seconds.** After one breath MERA offers _"I'm ready to step away"_. Keep grounding if you want, never because you have to.
-- **The phone-down screen is intentionally boring.** A timer, a tiny resting MERA, _Audio · Haptics · End early_. Nothing to read.
-- **The one number MERA shows is time away.** _"6 minutes back in the world."_ Not XP, points, streaks or badges. No comparisons, no shaming.
-- **The quieter you need it, the quieter MERA gets.** The character barely moves while you ground, almost disappears in phone-down mode, and only softly reappears when you return.
-- **No** feeds, notifications, streaks, achievements, social features, articles or chatbots.
-
-The most important part of MERA happens away from MERA.
-
-## Touch Grass fit
-
-| The challenge asks for… | MERA |
-| --- | --- |
-| Open-weight AI at the core | Gemma personalizes each real-world mission from your own history and explains why ("Walking was part of 4 resets that helped"). |
-| Getting people off the screen | Every reset ends in **phone-down mode**. Time away is measured from timestamps and is the product's main metric. |
-| Why open matters | Feelings and notes are some of the most personal things people write. Gemma can run **in your browser**, so they don't have to leave the device. |
 
 ## Why Gemma
 
@@ -127,6 +127,17 @@ Same history, other settings, same run:
 - **Low mobility** (MERA drops walking and movement signals before asking): _"Texture of Nature: sit quietly outside and touch the texture of a nearby plant or stone."_
 - **No history:** a generic sound reset with no reason.
 
+**The judge demo, live (2026-10-07).** The sample history (walks that helped, a sound-and-movement reset that helped, notes about cool air and birds) produces `cat_helped:movement:2:2`, `cat_helped:sensory:1:2`, `act_helped:walking:2`, `note_theme:fresh_air`, `note_theme:sound`. With the current feeling _Overstimulated_, Gemma returned, three runs in a row:
+
+```text
+Slow Walk and Listen  [movement · outdoor · 5 min]
+Walk slowly through your space and notice the feeling of your feet hitting the ground.
+Listen for the furthest sound you can hear.
+Why: Movement, walking, and sensory-based resets have helped in the past.
+```
+
+This run also caught a real bug: the output schema allowed only 4 cited signals while a request can carry 6. A full history therefore always fell back to the library. Fixed, with a test.
+
 The **About** screen in the app has a **Run a mission request** button. It runs exactly this against your own history and shows the structured input and the checked output, never hidden model text.
 
 ## Why open-weight AI
@@ -138,7 +149,7 @@ The **About** screen in the app has a **Run a mission request** button. It runs 
 - **Transparent and portable.** The model, prompts, validators and evaluation are all in this repo. Swap Gemma sizes or another open model by changing one id.
 - **No lock-in.** The same prompts run on-device or behind any OpenAI-compatible Gemma endpoint.
 
-## How privacy works
+## Privacy
 
 | | What happens |
 | --- | --- |
@@ -159,7 +170,7 @@ The current mode shows on Home, on every mission, in Settings and in About. It's
 
 **Controls (all real, all tested):** Export my data (JSON) · Delete reset history · Delete journal · Delete all local data · Disable AI analysis of notes · Reset personalization · Remove the downloaded model. No analytics, no trackers, nothing sold. Voice notes are stored as audio only and are **not transcribed**.
 
-## How fallback works
+## Offline fallback
 
 Model output → first balanced JSON object → **Zod schema** → **safety rules** (no traffic, strangers, unfamiliar places, night outdoors, strenuous activity, bare feet, tools, medical behaviour, screens or journaling; indoor-only, low-mobility, no-sound and no-smell respected; no clinical, crisis, dependency or hype language) → **personalization check** (cited signals must exist, reason grounded, numbers match). Failure → **one repair retry** → failure again → **library**. Timeouts and network errors go straight to the library, and each mission request has a **15-second budget**: if Gemma isn't done by then, the library answers, so nobody waits on a model. If storage fails (private mode, full disk), the reset still finishes. Raw model text is never rendered.
 
@@ -197,7 +208,7 @@ React 19 · TypeScript (strict) · Vite 8 · Tailwind CSS v4 · Motion · Zod ·
 
 Secondary pages are code-split and precached, so Home and the reset flow load first and everything works offline. The local model only downloads after you agree in Settings, then initializes in a Web Worker.
 
-## How to run it
+## Local development
 
 ```bash
 npm install
@@ -220,7 +231,7 @@ npm run build && npm start   # production server locally: http://localhost:8787
 | `MODEL_API_KEY` | — | Secret. Server-side only. |
 | `REMOTE_AI_RATE_LIMIT` | `40` | Requests per client per 10 minutes. |
 
-## How to deploy it
+## Deployment
 
 ### Cloudflare Workers (the live demo)
 
@@ -240,11 +251,17 @@ MERA ships a **Render Blueprint** (`render.yaml`): one Node web service that bui
 
 > **Status, stated plainly:** the live demo is currently hosted on Cloudflare Workers, **not** Render. The Render Blueprint is complete and the Node server is what the Playwright suite runs against, but a public Render deployment hasn't been made yet.
 
-## Demo (for judges, about 1–2 minutes)
+## Accessibility
 
-Settings → **Set up judge demo**. This turns on Demo mode (clearly labelled: 30-second phone-down, choice to step away after one breath) and adds **sample** resets and two sample notes ("Walking and the cool air helped."), all marked _sample_ and removable in one tap. The AI and everything else is real.
+- **Structure and keyboard:** semantic headings focused on every scene, fully keyboard-operable, visible focus, Escape exits a reset, and the rest of the app is `inert` during one.
+- **Touch and contrast:** 44–56 px touch targets; WCAG AA contrast in light and dark (axe-verified), plus a higher-contrast option and text-size options.
+- **Motion and senses:** reduced motion (OS or MERA setting); breathing is fully conveyed by words and a countdown; sound and haptics are optional and always paired with text.
+- **Timer:** a `role="timer"` that updates once a minute (no chatter).
+- **Colour:** state never depends on colour alone.
 
-Home → **GROUND ME** → _I'm here_ → feet on the ground → one breath → **I'm ready to step away** → _Overwhelmed_ → a personalized mission → **Why this reset?** → **I'm going** → _Good. Now put me away. Go touch grass._ → 30-second timer → _Welcome back_ → **Better** → optional note → short insight → **"N minutes back in the world"** → _Go live your life._ Then About → **Run a mission request** to see the structured input and output.
+## Safety boundaries
+
+MERA is a grounding and wellness tool. It is **not** therapy, a diagnosis, a treatment, or a crisis service, and it doesn't replace professional care. It never diagnoses, never gives medical advice, and filters AI output for clinical language. Pattern insights are observations ("seems", "has helped"), never conclusions. If you're in danger, contact local emergency services or a crisis line where you live.
 
 ## Real-world test
 
@@ -270,6 +287,12 @@ Complete → **Save a summary image** creates a private PNG with only the missio
 
 All screenshots are in `docs/screenshots/` (phone size, captured with `scripts/screenshots.ts`, light and dark). They come from a browser, not a physical phone.
 
+## Demo mode
+
+Settings → **Set up judge demo**. This turns on Demo mode (clearly labelled: 30-second phone-down, choice to step away after one breath) and adds **sample** resets and two sample notes ("Walking and the cool air helped."), all marked _sample_ and removable in one tap. The AI and everything else is real.
+
+Home → **GROUND ME** → _I'm here_ → feet on the ground → one breath → **I'm ready to step away** → _Overstimulated_ → a personalized mission → **Why this reset?** → **I'm going** → _Good. Now put me away. Go touch grass._ → 30-second timer → _Welcome back_ → **Better** → optional note → short insight → **"N minutes back in the world"** → _Go live your life._ Then About → **Run a mission request** to see the structured input and output.
+
 ## Testing
 
 ```bash
@@ -279,7 +302,7 @@ npm run lint && npm run typecheck
 npm run eval        # real-model mission evaluation (downloads Gemma 3 1B, CPU)
 ```
 
-**Covered:** state transitions (quick and full paths, step-away, try-another), timestamp timing (end early, return after the timer while the screen was off, cap), breathing and sensory flow, personalization signals (derivation, id validation, reset cutoff, note privacy by mode), history changing the mission (library and prompt), Gemma output checks (invented signals, unfounded or ungrounded reasons, clinical language, empty fields), safety rules, repair-then-fallback, reflection and pattern wording, storage, export and every delete, demo data isolation, and the server (health, config, structured-only Gemma proxy, headers, rate limit).
+**Covered:** the personalization pipeline traced from what's stored in IndexedDB → request → Gemma's prompt → structured answer → validation → rendered mission (with and without history, and after reset personalization), a large history staying bounded, state transitions (quick and full paths, step-away, try-another), timestamp timing (end early, return after the timer while the screen was off, cap), breathing and sensory flow, personalization signals (derivation, id validation, reset cutoff, note privacy by mode), history changing the mission (library and prompt), Gemma output checks (invented signals, unfounded or ungrounded reasons, clinical language, empty fields), safety rules, repair-then-fallback, reflection and pattern wording, storage, export and every delete, demo data isolation, and the server (health, config, structured-only Gemma proxy, headers, rate limit).
 
 **End to end:**
 - The full flow, and the quick path to a personalized mission in under 90 s.
@@ -292,18 +315,6 @@ npm run eval        # real-model mission evaluation (downloads Gemma 3 1B, CPU)
 ## Measured results
 
 The earlier run used real Gemma 3 1B (q4, CPU via transformers.js) through MERA's actual prompts, validators and safety rules. It was partial, covering 11 of 18 synthetic cases before the machine ran out of memory: **8 accepted (2 after the one repair retry), 3 fell back to the library, 0 unsafe missions shown.** That predates the personalization prompt and hasn't been re-measured yet. Details: [docs/EVALUATION.md](docs/EVALUATION.md).
-
-## Accessibility
-
-- **Structure and keyboard:** semantic headings focused on every scene, fully keyboard-operable, visible focus, Escape exits a reset, and the rest of the app is `inert` during one.
-- **Touch and contrast:** 44–56 px touch targets; WCAG AA contrast in light and dark (axe-verified), plus a higher-contrast option and text-size options.
-- **Motion and senses:** reduced motion (OS or MERA setting); breathing is fully conveyed by words and a countdown; sound and haptics are optional and always paired with text.
-- **Timer:** a `role="timer"` that updates once a minute (no chatter).
-- **Colour:** state never depends on colour alone.
-
-## Safety boundaries
-
-MERA is a grounding and wellness tool. It is **not** therapy, a diagnosis, a treatment, or a crisis service, and it doesn't replace professional care. It never diagnoses, never gives medical advice, and filters AI output for clinical language. Pattern insights are observations ("seems", "has helped"), never conclusions. If you're in danger, contact local emergency services or a crisis line where you live.
 
 ## Roadmap
 

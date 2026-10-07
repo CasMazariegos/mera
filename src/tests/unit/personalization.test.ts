@@ -143,3 +143,20 @@ describe("settings win over history", () => {
     expect(req.signals.some((id) => /movement|walking|stretch/.test(id))).toBe(false);
   });
 });
+
+describe("Gemma may cite every signal it was given", () => {
+  it("accepts up to 6 cited ids (the request's limit), so a full history never forces a fallback", () => {
+    const ids = ["cat_helped:movement:2:2", "cat_helped:sensory:1:2", "act_helped:walking:2", "note_theme:fresh_air", "note_theme:sound"];
+    const raw = JSON.stringify({
+      title: "Quiet Movement",
+      durationMinutes: 5,
+      category: "movement",
+      environment: "outdoor",
+      instruction: "Take a short walk somewhere familiar.",
+      reason: "Walking and listening have helped in your recent resets.",
+      personalizationSignals: ids,
+    });
+    const r = parseWith(missionSchema, raw);
+    expect(r.ok).toBe(true);
+  });
+});

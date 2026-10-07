@@ -27,7 +27,8 @@ import { MeraCharacter } from "@/components/MeraCharacter";
 import { Hills, Sky } from "@/components/Scenery";
 import { CATEGORY_ICON, CATEGORY_LABEL, CATEGORY_TINT, ENVIRONMENT_ICON, ENVIRONMENT_LABEL } from "@/components/icons";
 import { href } from "@/app/router";
-import { useGroundMe } from "@/hooks/useGroundMe";
+import { GroundMeButton } from "@/components/GroundMe";
+import { useSettings } from "@/store/settings";
 import { LIBRARY } from "@/features/missions/library";
 
 const rise = {
@@ -73,7 +74,7 @@ const FAQ: Array<[string, string]> = [
 ];
 
 export function Welcome() {
-  const ground = useGroundMe();
+  const setOnboarded = () => useSettings.getState().set({ onboarded: true });
   return (
     <div className="relative min-h-[100dvh] overflow-x-hidden" data-testid="welcome">
       {/* Hero */}
@@ -95,33 +96,38 @@ export function Welcome() {
                 <Sprout aria-hidden className="size-3.5 text-accent-strong" /> Meep Emotional Reset Assistant
               </p>
               <h1 className="mt-5 animate-rise font-display text-h1 font-medium tracking-tight text-balance text-ink [animation-delay:80ms] sm:text-display">
-                When it’s all too much, come back to <em className="font-normal text-accent-strong">yourself.</em>
+                Come back to <em className="font-normal text-accent-strong">yourself.</em>
               </h1>
-              <p className="mx-auto mt-5 max-w-md animate-rise text-h3 leading-snug text-balance text-ink-2 [animation-delay:160ms] md:mx-0">
-                A few calm minutes that get you <strong className="font-semibold text-ink">off</strong> your phone, not deeper into it. Breathe, come back to
-                your senses, then do one small thing in the real world.
-              </p>
-              <div className="mt-8 flex animate-rise flex-col gap-3 [animation-delay:240ms] sm:flex-row sm:justify-center md:justify-start">
+              {/* The first thing to press is the thing MERA is for. Everything else can wait. */}
+              <div className="mt-8 animate-rise [animation-delay:160ms]">
+                <GroundMeButton onPress={() => setOnboarded()} />
+              </div>
+              <p className="mt-5 animate-rise text-body text-ink-2 [animation-delay:200ms]">For when everything feels like too much.</p>
+              <p className="mt-1 animate-rise text-small text-muted [animation-delay:200ms]">Ground here. Then go be somewhere else.</p>
+              <p className="mt-6 flex animate-rise flex-wrap items-center justify-center gap-x-2 text-small [animation-delay:240ms] md:justify-start">
                 <a
                   href={href("/start")}
-                  className="btn-primary inline-flex min-h-14 items-center justify-center gap-2 rounded-full px-8 text-body font-semibold"
+                  className="inline-flex min-h-11 items-center gap-1 font-semibold text-accent-strong hover:underline"
                   data-testid="get-started"
                 >
-                  Get started <ArrowRight aria-hidden className="size-5" />
+                  New here? Set up in 3 taps <ArrowRight aria-hidden className="size-4" />
                 </a>
+                <span aria-hidden className="text-muted">
+                  ·
+                </span>
                 <button
                   type="button"
-                  onClick={ground}
-                  className="glass inline-flex min-h-14 items-center justify-center gap-2 rounded-full px-7 text-body font-semibold text-ink shadow-gentle"
+                  onClick={() => document.getElementById("idea")?.scrollIntoView({ behavior: "smooth" })}
+                  className="inline-flex min-h-11 items-center font-medium text-ink-2 hover:text-ink"
                 >
-                  I need it right now
+                  How it works
                 </button>
-              </div>
+              </p>
               <ul className="mt-6 flex flex-wrap justify-center gap-x-5 gap-y-2 text-small text-ink-2 md:justify-start">
                 {[
                   [UserX, "No account"],
                   [WifiOff, "Works offline"],
-                  [Lock, "Stays on your device"],
+                  [Lock, "History stays on your device"],
                 ].map(([Icon, t]) => {
                   const I = Icon as LucideIcon;
                   return (
@@ -430,7 +436,7 @@ function HeroPreview() {
           <div className="flex items-center justify-between text-micro font-semibold tracking-[0.14em] text-ink-2 uppercase">
             <span>Your reset</span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="size-1.5 rounded-full bg-accent" /> Local AI
+              <span className="size-1.5 rounded-full bg-accent" /> Example
             </span>
           </div>
           <div className="mt-3">

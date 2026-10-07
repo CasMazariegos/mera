@@ -43,10 +43,10 @@ export const missionSchema = z.object({
       .nullable()
       .transform((v) => v ?? undefined),
   ),
-  /** Ids of the personalization signals the mission was based on. Must be a subset of the ones sent. */
+  /** Ids of the personalization signals the mission was based on. Must be a subset of the ones sent (up to 6, same as the request). */
   personalizationSignals: z
     .array(z.string().max(48))
-    .max(4)
+    .max(6)
     .nullish()
     .transform((v) => v ?? []),
 });
