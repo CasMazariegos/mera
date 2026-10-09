@@ -367,7 +367,7 @@ export function SettingsPage() {
         <Toggle
           id="demo"
           label="Demo mode"
-          hint="Shorter timers (30-second phone-down, and the step-away choice after one breath) for presentations. The AI and everything else is real."
+          hint="Shorter timers (30-second phone-down, and the step-away choice after one breath) for presentations. The AI and everything else is real. “Set up judge demo” also adds labelled sample history and, when this server offers it, switches to Connected Gemma so personalization works without a model download."
           checked={s.demo}
           onChange={(v) => s.set({ demo: v })}
         />
@@ -375,7 +375,9 @@ export function SettingsPage() {
           <Button
             onClick={() =>
               void addSampleHistory().then(() => {
-                s.set({ demo: true, onboarded: true, personalizationSince: null });
+                // A judge should see Gemma personalize without a large model download: use Connected Gemma when this server has it.
+                const connected = server && server !== "none" && server.remoteAI;
+                s.set({ demo: true, onboarded: true, personalizationSince: null, ...(connected ? { aiMode: "remote" as const } : {}) });
                 navigate("/");
               })
             }
