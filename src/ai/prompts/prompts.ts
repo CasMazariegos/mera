@@ -7,7 +7,7 @@ import type { MissionRequest } from "@/ai/schemas/mission";
 import type { LibraryMission } from "@/features/missions/library";
 import { signalText } from "@/features/missions/signals";
 
-export const PROMPT_VERSION = "2026-10-07.1";
+export const PROMPT_VERSION = "2026-10-10.1";
 
 export type ChatMessage = { role: "user" | "assistant"; content: string };
 
@@ -45,7 +45,8 @@ function describe(req: MissionRequest): string {
     req.recentTitles.length ? `Don't repeat: ${req.recentTitles.join(", ")}` : "",
     req.signals.length
       ? `What has helped this person (from their own past resets):\n${req.signals.map((id) => `- [${id}] ${signalText(id)}`).join("\n")}`
-      : 'What has helped this person: nothing yet, so reason is "" and personalizationSignals is [].',
+      : // No quoted text here: small models copy it into "reason" verbatim (and break the JSON).
+        "What has helped this person: no history yet.",
   ]
     .filter(Boolean)
     .join("\n");

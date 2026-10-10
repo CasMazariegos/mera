@@ -57,6 +57,16 @@ describe("model output validation", () => {
     expect(empty.ok && empty.value.secondaryInstruction).toBeUndefined();
   });
 
+  it("a broken optional reason costs the reason, not the mission (real Gemma 3 1B output)", () => {
+    const raw =
+      '{"title":"Quiet Space","durationMinutes":5,"category":"indoor","environment":"indoor","instruction":"Find a quiet spot where you can sit quietly.","secondaryInstruction":"Close your eyes and focus on your breathing.","reason":"Nothing yet, so reason is "" and personalizationSignals is [].","personalizationSignals":[]}';
+    const r = parseWith(missionSchema, raw);
+    expect(r.ok && r.value.title).toBe("Quiet Space");
+    expect(r.ok && r.value.reason).toBeUndefined();
+    // Anything else that's broken is still rejected.
+    expect(parseWith(missionSchema, raw.replace('"Quiet Space"', '"Quiet "Space""')).ok).toBe(false);
+  });
+
   it("valid Gemma output becomes a mission tagged with its source", async () => {
     const m = await new GemmaProvider(scripted(good)).generateResetMission(req);
     expect(m).toMatchObject({ title: "Find the Movement", source: "local-gemma" });
@@ -118,6 +128,14 @@ describe("model output validation", () => {
     expect(unsafeMissionReason({ ...outdoor, instruction: "Look at your phone for five minutes." })).toMatch(/unsafe_phrase/);
     expect(unsafeMissionReason({ ...outdoor, instruction: "Leave your phone inside and step outside for a moment." })).toBeNull();
   });
+
+  it("touch isn't running (a false positive the live benchmark found)", () => {
+    const m = { title: "Texture Search", durationMinutes: 4, category: "sensory" as const, environment: "either" as const, instruction: "Find three textures near you." };
+    expect(unsafeMissionReason({ ...m, secondaryInstruction: "Run your fingertips over each one slowly." })).toBeNull();
+    expect(unsafeMissionReason({ ...m, secondaryInstruction: "Run cool water over your hands." })).toBeNull();
+    expect(unsafeMissionReason({ ...m, secondaryInstruction: "Run to the end of the street." })).toMatch(/unsafe_phrase/);
+    expect(unsafeMissionReason({ ...m, secondaryInstruction: "Go for a short run." })).toMatch(/unsafe_phrase/);
+  });
 });
 
 describe("non-clinical text", () => {
@@ -175,5 +193,11 @@ describe("prompts", () => {
     expect(all).not.toMatch(/latitude|longitude|address|city|gps/i);
     expect(all).toMatch(/Helped before: nature \(2\)/);
     expect(msgs.at(-1)!.role).toBe("user");
+  });
+
+  it("give a small model no quoted sentence to copy into the reason", () => {
+    const fresh = missionMessages({ ...req, helped: {}, signals: [] }, examplesFor(req));
+    expect(fresh.at(-1)!.content).toContain("What has helped this person: no history yet.");
+    expect(fresh.at(-1)!.content).not.toMatch(/""/);
   });
 });

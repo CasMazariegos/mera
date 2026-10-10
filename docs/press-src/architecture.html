@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,400&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #f5f1e8; --surface: #fcfaf5; --ink: #24271f; --ink2: #575b50; --muted: #686b60;
+    --accent: #4b6141; --accent-soft: #dfe7d2; --sky-soft: #dde7ee; --sky: #7f9aae;
+    --sunrise-soft: #f8e4d3; --clay: #c98a6b; --clay-soft: #f3ddd2; --sand: #efe5d1; --line: #ddd5c6;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { width: 1600px; height: 810px; background: var(--bg); font-family: Figtree, sans-serif; color: var(--ink); padding: 56px 64px; }
+  h1 { font-family: Fraunces, serif; font-weight: 500; font-size: 52px; letter-spacing: -0.01em; }
+  h1 em { color: var(--accent); font-style: italic; font-weight: 400; }
+  .sub { margin-top: 10px; font-size: 22px; color: var(--ink2); }
+  .row { display: grid; grid-template-columns: 1fr 50px 1.1fr 50px 1.15fr 50px 0.95fr; align-items: stretch; margin-top: 46px; }
+  .card { background: var(--surface); border-radius: 26px; padding: 26px 26px; box-shadow: 0 1px 2px rgb(60 50 30 / .06), 0 12px 32px -8px rgb(60 50 30 / .16); }
+  .tag { display: inline-block; font-size: 14px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; padding: 6px 12px; border-radius: 999px; }
+  .card h2 { font-family: Fraunces, serif; font-weight: 600; font-size: 28px; margin-top: 14px; }
+  .card p, .card li { font-size: 18px; line-height: 1.45; color: var(--ink2); margin-top: 10px; }
+  .card ul { padding-left: 20px; margin-top: 6px; }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: 15px; background: var(--sand); padding: 2px 7px; border-radius: 6px; color: var(--ink); }
+  .arrow { display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 34px; font-weight: 600; }
+  .opt { margin-top: 12px; border: 1.5px solid var(--line); border-radius: 16px; padding: 12px 14px; font-size: 17px; color: var(--ink2); }
+  .opt b { color: var(--ink); display: block; font-size: 18px; }
+  .check { display: flex; gap: 10px; align-items: baseline; font-size: 18px; color: var(--ink2); margin-top: 9px; }
+  .check i { font-style: normal; color: var(--accent); font-weight: 700; }
+  .fail { margin-top: 14px; padding: 12px 14px; background: var(--clay-soft); border-radius: 14px; font-size: 16.5px; color: var(--ink); }
+  .end { background: var(--accent); color: #fbf9f2; display: flex; flex-direction: column; justify-content: center; }
+  .end h2 { color: #fbf9f2; font-size: 36px; line-height: 1.15; }
+  .end p { color: #e3ead9; }
+  .foot { margin-top: 34px; display: flex; gap: 18px; font-size: 18px; color: var(--ink2); }
+  .pill { background: var(--surface); border-radius: 999px; padding: 10px 18px; }
+  .pill b { color: var(--ink); }
+</style>
+</head>
+<body>
+  <h1>Gemma decides <em>what.</em> Code decides <em>whether it's allowed.</em></h1>
+  <p class="sub">How MERA turns your own reset history into one small, safe thing to do away from the screen.</p>
+
+  <div class="row">
+    <div class="card">
+      <span class="tag" style="background: var(--accent-soft); color: var(--accent)">On your phone</span>
+      <h2>Your history → facts</h2>
+      <p>Past resets and notes stay in IndexedDB. MERA turns them into a few small signal ids:</p>
+      <p><code>cat_helped:movement:2:2</code><br /><code>act_helped:walking:2</code><br /><code>note_theme:fresh_air</code></p>
+      <p>Settings filter first: low mobility means no walking facts are sent at all.</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card">
+      <span class="tag" style="background: var(--sky-soft); color: #3f5a6e">Open Gemma</span>
+      <h2>Gemma writes one mission</h2>
+      <div class="opt"><b>LOCAL AI · Gemma 3 1B</b>In the browser (WebGPU / WASM). Nothing leaves the device.</div>
+      <div class="opt"><b>CONNECTED AI · Gemma 4 26B</b>Opt-in, on Workers AI. Gets the feeling, settings and signal ids. Never notes text.</div>
+      <p>Returns JSON: the mission, a one-line <i>why</i>, and which facts it used.</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card">
+      <span class="tag" style="background: var(--sunrise-soft); color: #8a5a1c">Plain code</span>
+      <h2>Every answer is checked</h2>
+      <div class="check"><i>✓</i><span>Schema (Zod), short, plain words</span></div>
+      <div class="check"><i>✓</i><span>Safety: no traffic, strangers, night walks, strenuous exercise, screens</span></div>
+      <div class="check"><i>✓</i><span>Settings: indoor-only, low mobility, no sound</span></div>
+      <div class="check"><i>✓</i><span>The <em>why</em> may only cite facts MERA sent, with numbers that match</span></div>
+      <div class="fail">Fails? One repair try, then the built-in library of 23 checked missions. Raw model text is never shown.</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card end">
+      <span class="tag" style="background: rgb(255 255 255 / .16); color: #fbf9f2; align-self: flex-start">The point</span>
+      <h2>“Good. Now put me away.”</h2>
+      <p>One mission. A boring phone-down timer. Then the only number MERA shows: minutes back in the world.</p>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span class="pill"><b>Offline?</b> Library mission, timer and return flow all still work</span>
+    <span class="pill"><b>Slow model?</b> 15-second budget, then the library answers</span>
+    <span class="pill"><b>Hosting:</b> one Hono API on Render and Cloudflare</span>
+  </div>
+</body>
+</html>

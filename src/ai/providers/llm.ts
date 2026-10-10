@@ -46,6 +46,21 @@ export function parseWith<S extends z.ZodTypeAny>(
   raw: string,
   check?: Check<z.infer<S>>,
 ): { ok: true; value: z.infer<S> } | { ok: false; problem: string } {
+  const first = parseOnce(schema, raw, check);
+  if (first.ok || !/"reason"\s*:/.test(raw)) return first;
+  // Small models sometimes put unescaped quotes in the optional "reason". It's the one field MERA can
+  // afford to lose (an empty reason is rebuilt from the cited facts), so blank it and try once more.
+  const blanked = raw.replace(/"reason"\s*:\s*".*?"\s*,\s*(?="personalizationSignals"\s*:)/s, '"reason": "", ');
+  if (blanked === raw) return first;
+  const second = parseOnce(schema, blanked, check);
+  return second.ok ? second : first;
+}
+
+function parseOnce<S extends z.ZodTypeAny>(
+  schema: S,
+  raw: string,
+  check?: Check<z.infer<S>>,
+): { ok: true; value: z.infer<S> } | { ok: false; problem: string } {
   const json = extractJsonObject(raw);
   if (!json) return { ok: false, problem: "no JSON object" };
   let data: unknown;
