@@ -67,6 +67,13 @@ describe("model output validation", () => {
     expect(parseWith(missionSchema, raw.replace('"Quiet Space"', '"Quiet "Space""')).ok).toBe(false);
   });
 
+  it("a mission a minute or two too long is trimmed, unless its words name the length (Gemma 3 1B's most common miss)", async () => {
+    const long = JSON.stringify({ ...JSON.parse(good), durationMinutes: 6 });
+    expect((await new GemmaProvider(scripted(long)).generateResetMission(req)).durationMinutes).toBe(5);
+    const named = JSON.stringify({ ...JSON.parse(good), durationMinutes: 6, instruction: "Walk slowly for six minutes somewhere familiar." });
+    await expect(new GemmaProvider(scripted(named, named)).generateResetMission(req)).rejects.toThrow(ProviderError);
+  });
+
   it("valid Gemma output becomes a mission tagged with its source", async () => {
     const m = await new GemmaProvider(scripted(good)).generateResetMission(req);
     expect(m).toMatchObject({ title: "Find the Movement", source: "local-gemma" });

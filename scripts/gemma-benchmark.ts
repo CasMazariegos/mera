@@ -9,7 +9,7 @@
  * Results are appended case by case to docs/benchmark/<model>.jsonl, so a run that
  * gets killed (the 1B run is CPU and memory heavy) still leaves what it measured.
  */
-import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { GemmaProvider } from "@/ai/providers/llm";
 import { remoteTransport } from "@/ai/providers/remote";
 import { ProviderError, type CompletionRequest, type ModelTransport } from "@/ai/providers/types";
@@ -19,7 +19,8 @@ import { toMission } from "@/features/missions/select";
 import { DEFAULT_PREFERENCES } from "@/store/settings";
 import type { Emotion, Outcome, Preferences, ResetRecord } from "@/types";
 
-const which = (process.argv[2] ?? "connected") as "connected" | "local-1b";
+// "replay": re-check the recorded first answers of a past local-1b run through today's code (no model).
+const which = (process.argv[2] ?? "connected") as "connected" | "local-1b" | "replay";
 const runs = Number(process.argv[3] ?? (which === "connected" ? 3 : 1));
 const base = process.argv[4] ?? "https://mera.casmazariegos.workers.dev";
 
@@ -98,10 +99,30 @@ async function localTransport(): Promise<ModelTransport> {
     },
   };
 }
+let current = "";
+const recorded = new Map<string, string>(
+  which !== "replay"
+    ? []
+    : readFileSync(new URL("../docs/benchmark/local-1b.jsonl", import.meta.url), "utf8")
+        .trim()
+        .split("\n")
+        .map((l) => JSON.parse(l) as { id: string; firstRaw?: string })
+        .filter((r) => r.firstRaw)
+        .map((r) => [r.id, r.firstRaw!]),
+);
+const replayTransport: ModelTransport = {
+  id: "local-gemma",
+  async complete(req) {
+    if (req.repair) throw new ProviderError("unavailable", `still rejected: ${req.repair.problem}`);
+    return recorded.get(current)!;
+  },
+};
 const inner =
   which === "connected"
     ? remoteTransport((input, init) => fetch(new URL(String(input), base), init))
-    : await localTransport();
+    : which === "replay"
+      ? replayTransport
+      : await localTransport();
 
 // Record why the first answer was sent back (the repair request carries the problem).
 // The server allows 40 requests per 10 minutes per visitor; a 429 is not a model result, so wait and ask again.
@@ -134,7 +155,8 @@ mkdirSync(outDir, { recursive: true });
 const outFile = new URL(`${which}.jsonl`, outDir);
 writeFileSync(outFile, "");
 
-for (const c of CASES.filter((x) => !process.env.ONLY || x.id === process.env.ONLY)) {
+for (const c of CASES.filter((x) => (!process.env.ONLY || x.id === process.env.ONLY) && (which !== "replay" || recorded.has(x.id)))) {
+  current = c.id;
   const prefs: Preferences = { ...DEFAULT_PREFERENCES, canGoOutside: "yes", ...c.prefs };
   const req = buildMissionRequest({ emotion: c.emotion, prefs, history: c.history, notes: (c.notes ?? []).map((text) => ({ text, at: Date.now() })), now: at(c.hour ?? 15) });
   for (let run = 0; run < (c.set === "held-out" ? 1 : runs); run++) {

@@ -75,7 +75,9 @@ function parseOnce<S extends z.ZodTypeAny>(
   return why ? { ok: false, problem: why } : { ok: true, value: r.data };
 }
 
-const CLAIMS_HISTORY = /\b(before|previous\w*|last time|recent\w*|past|again|helped|worked|usually|tend)\b/i;
+const NAMES_MINUTES = /\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|a few|several)[\s-]+min(ute)?s?\b/i;
+
+const CLAIMS_HISTORY =/\b(before|previous\w*|last time|recent\w*|past|again|helped|worked|usually|tend)\b/i;
 
 /**
  * "Why this reset?" must be true: cited ids must be ones MERA sent, a reason may
@@ -126,6 +128,9 @@ export class GemmaProvider implements MeraAIProvider {
   async generateResetMission(req: MissionRequest): Promise<GeneratedMission> {
     const msgs = missionMessages(req, examplesFor(req));
     const m = await this.ask("mission", req, msgs, missionSchema, 230, (v) => {
+      // Small models often round up a minute or two. A shorter mission is never less safe, so trim it,
+      // unless the words themselves name a length ("walk for six minutes"), which would then be wrong.
+      if (v.durationMinutes > req.minutes && !NAMES_MINUTES.test(`${v.instruction} ${v.secondaryInstruction ?? ""}`)) v.durationMinutes = req.minutes;
       if (v.durationMinutes > req.minutes) return "too_long_duration";
       if (req.recentTitles.includes(v.title)) return "repeated_title";
       // Ids the model wasn't given are dropped, not trusted. A reason that then has nothing behind it fails the check below.
