@@ -77,3 +77,24 @@ This is a small, synthetic check of the personalization path. It's not a substit
 ### Judge-demo scenario (2026-10-07)
 
 The sample history's 5 signals with feeling _Overstimulated_: 3 of 3 runs accepted. Each returned "Slow Walk and Listen" (walk slowly, notice your feet, listen for the furthest sound), with the reason "Movement, walking, and sensory-based resets have helped in the past." and all 5 signals cited. Before the fix, all 3 runs fell back to the library because the output schema capped cited signals at 4.
+
+## Benchmark: 25 scenarios, two Gemmas (2026-10-10)
+
+`scripts/gemma-benchmark.ts` runs MERA's real `GemmaProvider` on 25 scenarios (20 dev + 5 held out, written
+after `PROMPT_VERSION 2026-10-10.1` was frozen). Raw results, one line per run: `docs/benchmark/*.jsonl`.
+
+| | Gemma 4 26B A4B · Connected (Workers AI) | Gemma 3 1B q4 · Node/CPU (transformers.js) |
+| --- | --- | --- |
+| Runs | 77 (20+5 dev scenarios × 3, 2 of 5 held-out) | 30 (all, once) |
+| Accepted first answer / after repair / fell back | 74 / 2 / 1 | 19 / 5 / 6 |
+| Unsafe mission reaching a person | 0 | 0 |
+| Cited history when there was some | 45 of 46 | 5 of 19 |
+| Reason claiming history that didn't exist | 0 of 31 | 0 of 11 |
+| Median model time | 2.7 s | 58 s |
+
+- The 26B run stopped (laptop out of memory) after 2 of the 5 held-out cases; both passed.
+- All 6 of the 1B's fallbacks were `too_long_duration`. After the trim rule, replaying its recorded first
+  answers (`local-1b-replay-after-trim-fix.jsonl`, no new model run): 5 of 6 pass.
+- Bugs found and fixed: safety-rule false positives ("run your fingertips", "run a small stream of cool water",
+  "lift your feet"); a quoted sentence in the no-history prompt that the 1B copied into `reason`, breaking the JSON.
+- Earlier runs on prompt `2026-10-07.1` are kept as `*-prompt-2026-10-07.1*` (26B: 65 of 65 accepted).
