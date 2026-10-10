@@ -21,8 +21,9 @@ const UNSAFE_MISSION = [
   /\b(at night|in the dark|after dark|midnight|alone at)\b/i,
   /\b(barefoot|bare feet|take off your shoes|remove your shoes)\b/i,
   // "Run your fingertips over the bark" or "run cool water over your hands" is touch, not running.
-  /\brun\b(?!\s+(?:your\s+|cool\s+|cold\s+|warm\s+)?(?:finger\w*|hands?|palms?|water)\b)/i,
-  /\b(sprint|jog|hike|climb|push-?ups?|burpees?|hiit|workout|lift|swim|cold (plunge|shower)|ice bath)\b/i,
+  // A few words may sit between ("run a small stream of cool water"), but not a direction ("run to the water").
+  /\brun\b(?!(?:\s+(?!(?:along|to|toward|towards|around|through|down|up|across|by|past|into|on)\b)[\w-]+){0,5}\s+(?:water|tap|finger\w*|hands?|palms?|wrists?)\b)/i,
+  /\b(sprint|jog|hike|climb|push-?ups?|burpees?|hiit|workout|lift(ing)? (weights?|something heavy|heavy)|weightlifting|swim|cold (plunge|shower)|ice bath)\b/i,
   /\b(knife|fire|lighter|candle|match(es)?|tool|ladder|drive|car|bike|cycle|scooter)\b/i,
   /\b(medication|medicine|pill|dose|supplement|alcohol|drink(ing)? (wine|beer)|caffeine)\b/i,
   // Screen use (leaving the phone behind is encouraged; using it isn't).

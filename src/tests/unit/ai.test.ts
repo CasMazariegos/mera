@@ -133,6 +133,10 @@ describe("model output validation", () => {
     const m = { title: "Texture Search", durationMinutes: 4, category: "sensory" as const, environment: "either" as const, instruction: "Find three textures near you." };
     expect(unsafeMissionReason({ ...m, secondaryInstruction: "Run your fingertips over each one slowly." })).toBeNull();
     expect(unsafeMissionReason({ ...m, secondaryInstruction: "Run cool water over your hands." })).toBeNull();
+    expect(unsafeMissionReason({ ...m, secondaryInstruction: "Go to a sink and run a small stream of cool water over your hands." })).toBeNull();
+    expect(unsafeMissionReason({ ...m, secondaryInstruction: "Run down to the water." })).toMatch(/unsafe_phrase/);
+    expect(unsafeMissionReason({ ...m, secondaryInstruction: "Lift your feet slightly higher than usual." })).toBeNull();
+    expect(unsafeMissionReason({ ...m, secondaryInstruction: "Lift weights for five minutes." })).toMatch(/unsafe_phrase/);
     expect(unsafeMissionReason({ ...m, secondaryInstruction: "Run to the end of the street." })).toMatch(/unsafe_phrase/);
     expect(unsafeMissionReason({ ...m, secondaryInstruction: "Go for a short run." })).toMatch(/unsafe_phrase/);
   });
